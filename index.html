@@ -3,344 +3,866 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Moonlit Grove RPG</title>
+  <title>Astral Realm: World Tree Paradox 4D</title>
   <style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    
-    /* Cosmic Temple Background */
-    body { 
-      background: #0b0c10 url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed; 
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      background: #06020c;
+      color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* 4D CANVAS BACKGROUND WITH MOVING Hyper-Cubes */
+    .bg-canvas-4d {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+      perspective: 1200px;
+      background: radial-gradient(circle at 50% 50%, #1a082b 0%, #030107 100%);
+    }
+
+    .grid-4d {
+      position: absolute;
+      width: 250%;
+      height: 250%;
+      top: -75%;
+      left: -75%;
+      background-image: 
+        linear-gradient(rgba(168, 85, 247, 0.18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(6, 182, 212, 0.18) 1px, transparent 1px);
+      background-size: 60px 60px;
+      transform: rotateX(75deg) translateZ(-150px);
+      animation: gridShift 12s linear infinite;
+    }
+
+    @keyframes gridShift {
+      0% { transform: rotateX(75deg) translateY(0) translateZ(-150px); }
+      100% { transform: rotateX(75deg) translateY(60px) translateZ(-150px); }
+    }
+
+    /* Floating Hypercube Particles */
+    .hypercube-particle {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+      animation: rotateTesseract 10s infinite linear;
+    }
+
+    @keyframes rotateTesseract {
+      0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+      100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+    }
+
+    /* 4D Floating Character Holograms */
+    .char-avatar-4d {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(8px) drop-shadow(0 0 30px currentColor);
+      opacity: 0.6;
+      animation: float4D 9s ease-in-out infinite alternate;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 4rem;
+      border: 2px dashed currentColor;
+    }
+
+    .char-lyra-4d {
+      left: 5%; top: 10%; width: 220px; height: 220px; color: #c084fc;
+      background: radial-gradient(circle, rgba(192, 132, 252, 0.35) 0%, transparent 70%);
+      animation-duration: 8s;
+    }
+
+    .char-ignis-4d {
+      right: 5%; bottom: 8%; width: 240px; height: 240px; color: #f97316;
+      background: radial-gradient(circle, rgba(249, 115, 22, 0.35) 0%, transparent 70%);
+      animation-duration: 11s;
+    }
+
+    .char-sylph-4d {
+      right: 10%; top: 12%; width: 180px; height: 180px; color: #22d3ee;
+      background: radial-gradient(circle, rgba(34, 211, 238, 0.35) 0%, transparent 70%);
+      animation-duration: 7s;
+    }
+
+    .char-boss-4d {
+      left: 6%; bottom: 8%; width: 260px; height: 260px; color: #f43f5e;
+      background: radial-gradient(circle, rgba(244, 63, 94, 0.3) 0%, transparent 70%);
+      animation-duration: 13s;
+    }
+
+    @keyframes float4D {
+      0% { transform: translateY(0) rotate(0deg) scale(1); }
+      50% { transform: translateY(-40px) rotate(180deg) scale(1.15); }
+      100% { transform: translateY(15px) rotate(360deg) scale(0.9); }
+    }
+
+    /* Game Main Container */
+    .game-card {
+      width: 100%;
+      max-width: 900px;
+      background: rgba(12, 6, 24, 0.92);
+      backdrop-filter: blur(25px);
+      border-radius: 20px;
+      border: 1px solid rgba(168, 85, 247, 0.7);
+      box-shadow: 0 0 50px rgba(168, 85, 247, 0.4), inset 0 0 30px rgba(6, 182, 212, 0.2);
+      padding: 25px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* HUD Bar */
+    .hud-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: rgba(8, 4, 18, 0.9);
+      border: 1px solid rgba(147, 51, 234, 0.5);
+      border-radius: 12px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+    }
+
+    .hud-stats {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 0.95rem;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+    }
+
+    .stat-hp { color: #f43f5e; }
+    .stat-mana { color: #c084fc; }
+    .stat-gems { color: #38bdf8; }
+    .stat-level { color: #eab308; }
+
+    .hud-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-hud {
+      background: rgba(147, 51, 234, 0.3);
+      border: 1px solid #a855f7;
+      color: #e9d5ff;
+      padding: 7px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .btn-hud:hover {
+      background: rgba(147, 51, 234, 0.6);
+      box-shadow: 0 0 14px rgba(168, 85, 247, 0.7);
+    }
+
+    /* Inventory Panel */
+    .inventory-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 10px;
+      padding: 8px 14px;
+      margin-bottom: 20px;
+      font-size: 0.88rem;
+      flex-wrap: wrap;
+    }
+
+    .inv-slot {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #06b6d4;
+      padding: 4px 10px;
+      border-radius: 6px;
+      color: #67e8f9;
+      font-weight: 600;
+    }
+
+    /* Health & Mana Bars Visual */
+    .bar-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .hp-track, .mana-track {
+      width: 90px;
+      height: 10px;
+      background: #334155;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .hp-track { border: 1px solid #f43f5e; }
+    .mana-track { border: 1px solid #a855f7; }
+
+    .hp-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #ef4444, #f43f5e);
+      transition: width 0.3s ease;
+    }
+
+    .mana-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #8b5cf6, #c084fc);
+      transition: width 0.3s ease;
+    }
+
+    /* Character Portrait Banner */
+    .character-banner {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      border-radius: 15px;
+      overflow: hidden;
+      border: 2px solid #a855f7;
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.5);
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding-bottom: 15px;
       background-size: cover;
-      color: #c5c6c7; 
-      margin: 0; 
-      padding: 20px; 
-      display: flex; 
-      justify-content: center; 
-      align-items: center; 
-      min-height: 100vh; 
-    }
-    
-    .game-card { 
-      max-width: 650px; 
-      width: 100%; 
-      background: rgba(15, 12, 29, 0.85); 
-      backdrop-filter: blur(10px);
-      border-radius: 16px; 
-      border: 1px solid rgba(179, 136, 255, 0.4); 
-      padding: 25px; 
-      box-shadow: 0 0 30px rgba(156, 39, 176, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.05); 
-    }
-    
-    .stats-bar { 
-      display: grid; 
-      grid-template-columns: repeat(2, 1fr); 
-      gap: 10px; 
-      background: rgba(11, 12, 16, 0.8); 
-      padding: 12px 18px; 
-      border-radius: 10px; 
-      border: 1px solid rgba(179, 136, 255, 0.3); 
-      margin-bottom: 20px; 
-      font-weight: 600; 
-      font-size: 0.95rem; 
-    }
-    .stat-item { display: flex; align-items: center; gap: 6px; }
-    .stat-value { color: #d1c4e9; }
-    
-    .timer-box { 
-      grid-column: span 2; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      background: rgba(42, 26, 66, 0.6); 
-      padding: 8px 12px; 
-      border-radius: 8px; 
-      border: 1px solid #b388ff; 
-      margin-top: 5px; 
-    }
-    .gem-btn { 
-      background: #7c4dff; 
-      color: #fff; 
-      border: none; 
-      padding: 6px 12px; 
-      border-radius: 6px; 
-      font-weight: bold; 
-      cursor: pointer; 
-      transition: 0.2s; 
-    }
-    .gem-btn:hover:not(:disabled) { background: #651fff; transform: scale(1.03); }
-    .gem-btn:disabled { background: #333; color: #777; cursor: not-allowed; }
-
-    .audio-btn { 
-      background: rgba(31, 40, 51, 0.8); 
-      color: #b388ff; 
-      border: 1px solid #b388ff; 
-      padding: 4px 8px; 
-      border-radius: 6px; 
-      cursor: pointer; 
+      background-position: center;
+      transition: background-image 0.5s ease-in-out;
     }
 
-    .character-box { 
-      display: flex; 
-      align-items: center; 
-      gap: 12px; 
-      background: rgba(11, 12, 16, 0.8); 
-      padding: 12px; 
-      border-radius: 10px; 
-      margin-bottom: 15px; 
-      border-left: 4px solid #b388ff; 
+    .character-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10, 5, 20, 0.95) 0%, rgba(10, 5, 20, 0.3) 60%, transparent 100%);
     }
-    .avatar { 
-      width: 45px; 
-      height: 45px; 
-      background: #7c4dff; 
-      border-radius: 50%; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      font-size: 1.4rem; 
-    }
-    .char-info h3 { margin: 0; color: #d1c4e9; font-size: 1.1rem; }
-    .char-info p { margin: 2px 0 0 0; color: #9fa8da; font-size: 0.85rem; }
 
-    .story-text { line-height: 1.6; font-size: 1rem; color: #f3e5f5; margin-bottom: 25px; min-height: 60px; }
-
-    .choices-container { display: flex; flex-direction: column; gap: 12px; }
-    .choice-btn { 
-      background: rgba(18, 11, 36, 0.85); 
-      color: #e1bee7; 
-      border: 1px solid rgba(179, 136, 255, 0.4); 
-      padding: 14px 18px; 
-      border-radius: 10px; 
-      text-align: left; 
-      cursor: pointer; 
-      font-size: 0.95rem; 
-      font-weight: 500; 
-      transition: all 0.2s ease; 
+    .character-title {
+      position: relative;
+      z-index: 2;
+      text-align: center;
     }
-    .choice-btn:hover { 
-      background: #7c4dff; 
-      color: #fff; 
-      border-color: #b388ff; 
-      transform: translateY(-2px); 
-      box-shadow: 0 4px 12px rgba(124, 77, 255, 0.4); 
+
+    .character-title h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: transparent;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    }
+
+    .name-lyra { background: linear-gradient(90deg, #c084fc, #e879f9); -webkit-background-clip: text; }
+    .name-ignis { background: linear-gradient(90deg, #f97316, #fbbf24); -webkit-background-clip: text; }
+    .name-sylph { background: linear-gradient(90deg, #22d3ee, #34d399); -webkit-background-clip: text; }
+    .name-zephyr { background: linear-gradient(90deg, #a7f3d0, #38bdf8); -webkit-background-clip: text; }
+    .name-void { background: linear-gradient(90deg, #a855f7, #6366f1); -webkit-background-clip: text; }
+    .name-boss { background: linear-gradient(90deg, #f43f5e, #e11d48); -webkit-background-clip: text; }
+    .name-victory { background: linear-gradient(90deg, #facc15, #fef08a); -webkit-background-clip: text; }
+
+    .character-title span {
+      font-size: 0.95rem;
+      color: #c084fc;
+      font-weight: 500;
+    }
+
+    /* Combat Log Area */
+    .combat-log {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 15px;
+      font-size: 0.85rem;
+      max-height: 80px;
+      overflow-y: auto;
+      color: #38bdf8;
+      font-family: monospace;
+    }
+
+    /* Story Box */
+    .story-box {
+      background: rgba(8, 4, 16, 0.75);
+      border-left: 4px solid #06b6d4;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+      min-height: 90px;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Choice Buttons Grid */
+    .choices-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 600px) {
+      .choices-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .btn-choice {
+      background: rgba(22, 12, 38, 0.88);
+      border: 1px solid rgba(236, 72, 153, 0.5);
+      color: #f472b6;
+      padding: 14px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .btn-choice span.subtext {
+      font-size: 0.78rem;
+      font-weight: normal;
+      opacity: 0.8;
+    }
+
+    .btn-choice:hover {
+      transform: translateY(-2px);
+      border-color: #06b6d4;
+      color: #67e8f9;
+      box-shadow: 0 0 18px rgba(6, 182, 212, 0.4);
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .rune-footer {
+      margin-top: 25px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(168, 85, 247, 0.3);
+      text-align: center;
+      font-family: monospace;
+      letter-spacing: 6px;
+      color: #c084fc;
+      font-size: 0.95rem;
+      opacity: 0.8;
+      text-shadow: 0 0 10px #a855f7;
     }
   </style>
 </head>
 <body>
 
+<!-- 4D Background -->
+<div class="bg-canvas-4d">
+  <div class="grid-4d"></div>
+  <div class="char-avatar-4d char-lyra-4d">🔮</div>
+  <div class="char-avatar-4d char-ignis-4d">🔥</div>
+  <div class="char-avatar-4d char-sylph-4d">🧚</div>
+  <div class="char-avatar-4d char-boss-4d">👁️</div>
+</div>
+
 <div class="game-card">
-  <!-- Top Stats Bar -->
-  <div class="stats-bar">
-    <div class="stat-item">✨ Mana: <span class="stat-value" id="manaVal">100</span></div>
-    <div class="stat-item">💎 Gems: <span class="stat-value" id="gemsVal">0</span></div>
-    <div class="stat-item">📜 Artifact: <span class="stat-value" id="artifactVal">None</span></div>
-    <button class="audio-btn" id="musicBtn">🎵 Music: OFF</button>
-    
-    <!-- Free Gems Timer System -->
-    <div class="timer-box">
-      <span>⏳ Free Gems in: <strong id="timerVal" style="color:#b388ff;">5s</strong></span>
-      <button class="gem-btn" id="claimGemsBtn" disabled>🎁 Claim +10 Gems</button>
+  <!-- HUD Top Bar -->
+  <div class="hud-bar">
+    <div class="hud-stats">
+      <div class="stat-item stat-hp">
+        ❤️ HP: <span id="hpVal">100</span>
+        <div class="bar-container">
+          <div class="hp-track"><div class="hp-fill" id="hpBar"></div></div>
+        </div>
+      </div>
+      <div class="stat-item stat-mana">
+        ✨ Mana: <span id="manaVal">100</span>
+        <div class="bar-container">
+          <div class="mana-track"><div class="mana-fill" id="manaBar"></div></div>
+        </div>
+      </div>
+      <div class="stat-item stat-gems">💎 Gems: <span id="gemsVal">0</span></div>
+      <div class="stat-item stat-level">⭐ Lvl: <span id="lvlVal">1</span></div>
+    </div>
+    <div class="hud-actions">
+      <button class="btn-hud" id="claimGemsBtn">🎁 Mine Gems (+15)</button>
+      <button class="btn-hud" id="meditateBtn">🧘 Meditate (+25 Mana)</button>
+      <button class="btn-hud" id="musicToggle">🎵 Music: OFF</button>
     </div>
   </div>
 
-  <!-- Speaker Header -->
-  <div class="character-box">
-    <div class="avatar" id="avatarIcon">🔮</div>
-    <div class="char-info">
-      <h3 id="speakerName">High Priestess Lyra</h3>
-      <p id="speakerTitle">Guardian of the Astral Plane</p>
+  <!-- Inventory HUD -->
+  <div class="inventory-bar">
+    <strong>🎒 Inventory:</strong>
+    <span class="inv-slot" id="invItem">Empty</span>
+  </div>
+
+  <!-- Character Banner -->
+  <div class="character-banner" id="charBanner">
+    <div class="character-overlay"></div>
+    <div class="character-title">
+      <h2 id="charName">High Priestess Lyra</h2>
+      <span id="charRole">Guardian of the Astral Plane</span>
     </div>
+  </div>
+
+  <!-- Combat & Action Log -->
+  <div class="combat-log" id="combatLog">
+    > Timeline initialized. Reality anchors set...
   </div>
 
   <!-- Story Text -->
-  <div class="story-text" id="storyText">Loading game...</div>
+  <div class="story-box" id="storyText">
+    Loading temporal plane...
+  </div>
 
-  <!-- Action Choices -->
-  <div class="choices-container" id="choicesBox"></div>
+  <!-- Dynamic Choices -->
+  <div class="choices-grid" id="choicesBox"></div>
+
+  <!-- Cosmic Runes -->
+  <div class="rune-footer">
+    ᚠ ᚢ TH ᚨ ᚱ ᚲ ᚷ ᚠ ᚢ TH ᚨ ᚱ ᚲ
+  </div>
 </div>
 
 <audio id="bgMusic" loop src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=fantasy-medieval-112992.mp3"></audio>
 
 <script>
-  // Game State
-  const gameState = {
+  // Dynamic Game State
+  const state = {
+    hp: 100,
+    maxHp: 100,
     mana: 100,
+    maxMana: 100,
     gems: 0,
-    artifact: 'Starlight Scroll',
-    currentScene: 'start'
+    level: 1,
+    exp: 0,
+    inventory: []
   };
 
-  // Timer Variables
-  let gemTimer = 5;
-  const claimBtn = document.getElementById('claimGemsBtn');
-  const timerDisplay = document.getElementById('timerVal');
-
-  // Gem Countdown Loop
-  setInterval(() => {
-    if (gemTimer > 0) {
-      gemTimer--;
-      timerDisplay.textContent = `${gemTimer}s`;
-    } else {
-      timerDisplay.textContent = "READY!";
-      claimBtn.disabled = false;
-    }
-  }, 1000);
-
-  // Claim Gems Button Handler
-  claimBtn.addEventListener('click', () => {
-    gameState.gems += 10;
-    gemTimer = 5;
-    claimBtn.disabled = true;
-    timerDisplay.textContent = `${gemTimer}s`;
-    updateUI();
-    renderScene(gameState.currentScene); // Refresh dynamic shop choices
-  });
-
-  // Audio Handler
   const music = document.getElementById('bgMusic');
-  const musicBtn = document.getElementById('musicBtn');
+  const musicBtn = document.getElementById('musicToggle');
   let isPlaying = false;
+
+  function logAction(msg) {
+    const log = document.getElementById('combatLog');
+    log.innerHTML += `<br>> ${msg}`;
+    log.scrollTop = log.scrollHeight;
+  }
 
   musicBtn.addEventListener('click', () => {
     if (isPlaying) {
       music.pause();
       musicBtn.textContent = '🎵 Music: OFF';
+      logAction("Music paused.");
     } else {
       music.play();
       musicBtn.textContent = '⏸️ Music: ON';
+      logAction("Astral harmony echoing...");
     }
     isPlaying = !isPlaying;
   });
 
-  // Story Nodes
-  const story = {
+  document.getElementById('claimGemsBtn').addEventListener('click', () => {
+    state.gems += 15;
+    logAction("Mined 15 Astral Gems from the rift!");
+    updateHUD();
+  });
+
+  document.getElementById('meditateBtn').addEventListener('click', () => {
+    if (state.mana < state.maxMana) {
+      state.mana = Math.min(state.maxMana, state.mana + 25);
+      logAction("Channeled cosmic energy (+25 Mana).");
+      updateHUD();
+    } else {
+      logAction("Mana is already at maximum capacity!");
+    }
+  });
+
+  function addExp(amount) {
+    state.exp += amount;
+    logAction(`Gained ${amount} EXP!`);
+    if (state.exp >= 100) {
+      state.level += 1;
+      state.exp -= 100;
+      state.maxHp += 20;
+      state.maxMana += 20;
+      state.hp = state.maxHp;
+      state.mana = state.maxMana;
+      logAction(`🎉 LEVEL UP! Reached Level ${state.level}! HP and Mana restored & expanded!`);
+    }
+  }
+
+  function updateHUD() {
+    document.getElementById('hpVal').textContent = `${state.hp}/${state.maxHp}`;
+    document.getElementById('hpBar').style.width = ((state.hp / state.maxHp) * 100) + '%';
+    document.getElementById('manaVal').textContent = `${state.mana}/${state.maxMana}`;
+    document.getElementById('manaBar').style.width = ((state.mana / state.maxMana) * 100) + '%';
+    document.getElementById('gemsVal').textContent = state.gems;
+    document.getElementById('lvlVal').textContent = state.level;
+    document.getElementById('invItem').textContent = state.inventory.length > 0 ? state.inventory.join(', ') : 'Empty';
+  }
+
+  const scenes = {
     start: {
-      speaker: "High Priestess Lyra",
-      title: "Guardian of the Astral Plane",
-      avatar: "🔮",
-      text: "High Priestess Lyra summons you into the Moonlit Grove. 'Dark shadow magic has corrupted the World Tree. Take this Starlight Scroll and enter the forest.'",
+      name: "High Priestess Lyra",
+      nameClass: "name-lyra",
+      role: "Guardian of the Astral Plane",
+      bg: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80",
+      text: "High Priestess Lyra greets you in the Moonlit Grove. 'The 4D temporal Rift has opened! Take this Starlight Compass and choose your path through the multi-dimensional flux.'",
       onEnter: () => {
-        gameState.artifact = 'Starlight Scroll';
-      },
-      choices: [
-        { text: "🌲 Follow the Glowing Mushroom Path into the woods", target: "forest" },
-        { text: "⛰️ Climb the Mist Mountains to speak with the Alchemist", target: "alchemist" }
-      ]
-    },
-    alchemist: {
-      speaker: "Master Ignis",
-      title: "Potion Master",
-      avatar: "🧪",
-      text: "In his mountain hut, Master Ignis stirs a cauldron. 'I can forge you a Phoenix Tear, but it costs 30 Gems—or I will trade it for your Starlight Scroll.'",
-      choices: () => {
-        const options = [];
-        
-        // Unlocks option when player reaches 30 Gems
-        if (gameState.gems >= 30) {
-          options.push({ text: "💎 Buy Phoenix Tear (Costs 30 Gems)", target: "buySuccess" });
+        if (!state.inventory.includes('Starlight Compass')) {
+          state.inventory.push('Starlight Compass');
+          logAction("Received Starlight Compass from Lyra.");
         }
-        
-        // Dynamic trade option
-        if (gameState.artifact === 'Starlight Scroll') {
-          options.push({ text: "🔄 Trade Starlight Scroll for Phoenix Tear", target: "tradeSuccess" });
-        }
-        
-        options.push({ text: "🏃 Leave the hut and dive into the Moonlit Grove", target: "forest" });
-        return options;
-      }
-    },
-    buySuccess: {
-      speaker: "Master Ignis",
-      title: "Potion Master",
-      avatar: "🧪",
-      text: "'Here is your Phoenix Tear! Thank you for the 30 Gems!'",
-      onEnter: () => {
-        gameState.gems -= 30;
-        gameState.artifact = 'Phoenix Tear';
       },
       choices: [
-        { text: "🌲 Enter the Moonlit Grove woods", target: "forest" }
+        { title: "🌲 Enter Mushroom Forest", sub: "Locate Sylph the Sprite", target: "forest" },
+        { title: "⛰️ Forge Path Up Fire Mountain", sub: "Meet Master Ignis", target: "ignis" },
+        { title: "🌬️ Ascend Sky Sanctuary", sub: "Consult Zephyr the Wind Whisperer", target: "zephyr" },
+        { title: "🌌 Portal to Nether Void", sub: "Investigate Void Scholar Nexus", target: "void" }
       ]
     },
-    tradeSuccess: {
-      speaker: "Master Ignis",
-      title: "Potion Master",
-      avatar: "🧪",
-      text: "'A fine trade!' Ignis hands you a glowing red vial containing the Phoenix Tear.",
-      onEnter: () => {
-        gameState.artifact = 'Phoenix Tear';
-      },
-      choices: [
-        { text: "🌲 Enter the Moonlit Grove woods", target: "forest" }
-      ]
-    },
+
     forest: {
-      speaker: "Sylph the Fairy",
-      title: "Forest Sprite",
-      avatar: "🧚",
-      text: "A glowing fairy named Sylph flits around your head. 'A shadow beast guards the ancient bridge ahead! How will you cross?'",
-      choices: () => {
-        const options = [];
-        if (gameState.artifact === 'Phoenix Tear') {
-          options.push({ text: "🔥 Use Phoenix Tear to purify the Shadow Beast", target: "win" });
+      name: "Sylph the Fairy",
+      nameClass: "name-sylph",
+      role: "Forest Sprite",
+      bg: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80",
+      text: "Sylph hovers above: 'I can forge the Song of Creation to pacify the beast if you channel 60 Mana, or give you the Astral Mirror!'",
+      choices: [
+        {
+          title: "🎵 Learn Song of Creation (60 Mana)",
+          sub: "Harmonic Pacification Victory",
+          condition: () => state.mana >= 60,
+          action: () => {
+            state.mana -= 60;
+            state.inventory.push('Harmonic Harp');
+            addExp(40);
+            logAction("Spent 60 Mana to obtain the Harmonic Harp!");
+          },
+          target: "boss"
+        },
+        {
+          title: "🪞 Claim Astral Mirror",
+          sub: "Reflect Shadow Energy",
+          action: () => {
+            if (!state.inventory.includes('Astral Mirror')) {
+              state.inventory.push('Astral Mirror');
+              addExp(25);
+              logAction("Acquired the Astral Mirror!");
+            }
+          },
+          target: "boss"
+        },
+        { title: "⛰️ Visit Master Ignis", sub: "Go to Mountain Forge", target: "ignis" },
+        { title: "🌬️ Head to Sky Sanctuary", sub: "Meet Zephyr", target: "zephyr" }
+      ]
+    },
+
+    ignis: {
+      name: "Master Ignis",
+      nameClass: "name-ignis",
+      role: "Potion Master & Blacksmith",
+      bg: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1000&q=80",
+      text: "Ignis strikes his anvil: 'I can forge the Phoenix Blade for 30 Gems, or assemble a 4D Chrono Trap if you have 50 Gems!'",
+      choices: [
+        {
+          title: "⚔️ Forge Phoenix Blade (30 Gems)",
+          sub: "Combat Slayer Victory Path",
+          condition: () => state.gems >= 30,
+          action: () => {
+            state.gems -= 30;
+            state.inventory.push('Phoenix Blade');
+            addExp(50);
+            logAction("Forged the legendary Phoenix Blade!");
+          },
+          target: "boss"
+        },
+        {
+          title: "⏳ Build 4D Chrono Trap (50 Gems)",
+          sub: "Temporal Loop Victory Path",
+          condition: () => state.gems >= 50,
+          action: () => {
+            state.gems -= 50;
+            state.inventory.push('Chrono Trap');
+            addExp(60);
+            logAction("Constructed the 4D Chrono Trap!");
+          },
+          target: "boss"
+        },
+        { title: "🌲 Head to Forest Path", sub: "Go to Sylph", target: "forest" },
+        { title: "🌌 Enter Void Nexus", sub: "Seek Void Scholar", target: "void" }
+      ]
+    },
+
+    zephyr: {
+      name: "Zephyr the Sky Warden",
+      nameClass: "name-zephyr",
+      role: "Master of Aeromancy",
+      bg: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80",
+      text: "Zephyr floats amidst swirling gale clouds: 'The Sky Realm grants speed and foresight. Absorb the Storm Orb or learn Wind Step!'",
+      choices: [
+        {
+          title: "⚡ Infuse Storm Orb (40 Mana)",
+          sub: "Empower attacks with lightning speed",
+          condition: () => state.mana >= 40,
+          action: () => {
+            state.mana -= 40;
+            state.inventory.push('Storm Orb');
+            addExp(45);
+            logAction("Claimed the Storm Orb!");
+          },
+          target: "boss"
+        },
+        {
+          title: "🕊️ Learn Wind Step",
+          sub: "Evasion & Defense Boost",
+          action: () => {
+            state.maxHp += 30;
+            state.hp += 30;
+            addExp(30);
+            logAction("Learned Wind Step! Max HP permanently +30!");
+          },
+          target: "forest"
+        },
+        { title: "⛰️ Descend to Fire Mountain", sub: "Meet Master Ignis", target: "ignis" }
+      ]
+    },
+
+    void: {
+      name: "Scholar Nexus",
+      nameClass: "name-void",
+      role: "Void Dimension Researcher",
+      bg: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80",
+      text: "Nexus peers into an obsidian portal: 'The Shadow Beast was born from spatial corruption. Take this Spatial Wand or study Void Magic!'",
+      choices: [
+        {
+          title: "🪄 Harness Spatial Wand (40 Gems)",
+          sub: "Banish dimensional horrors",
+          condition: () => state.gems >= 40,
+          action: () => {
+            state.gems -= 40;
+            state.inventory.push('Spatial Wand');
+            addExp(50);
+            logAction("Acquired the Spatial Wand!");
+          },
+          target: "boss"
+        },
+        {
+          title: "🔮 Study Dark Alchemy",
+          sub: "Sacrifice 20 HP to gain 80 Mana",
+          condition: () => state.hp > 20,
+          action: () => {
+            state.hp -= 20;
+            state.mana = Math.min(state.maxMana, state.mana + 80);
+            addExp(35);
+            logAction("Used Dark Alchemy (-20 HP, +80 Mana)!");
+          },
+          target: "forest"
+        },
+        { title: "🌲 Return to Mushroom Forest", sub: "Visit Sylph", target: "forest" }
+      ]
+    },
+
+    boss: {
+      name: "Shadow Beast",
+      nameClass: "name-boss",
+      role: "Temporal Distortion Boss",
+      bg: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=1000&q=80",
+      text: "The colossal Shadow Beast emerges from the 4D temporal rift, unleashing dark shockwaves across space-time!",
+      choices: [
+        {
+          title: "🔥 Path 1: Strike with Phoenix Blade",
+          sub: "Execute Flaming Critical Strike",
+          condition: () => state.inventory.includes('Phoenix Blade'),
+          target: "winBlade"
+        },
+        {
+          title: "⏳ Path 2: Deploy 4D Chrono Trap",
+          sub: "Lock beast in endless tesseract loop",
+          condition: () => state.inventory.includes('Chrono Trap'),
+          target: "winTrap"
+        },
+        {
+          title: "🎵 Path 3: Play Harmonic Harp",
+          sub: "Purify shadow essence into peace",
+          condition: () => state.inventory.includes('Harmonic Harp'),
+          target: "winHarp"
+        },
+        {
+          title: "🪞 Path 4: Reflect Energy with Astral Mirror",
+          sub: "Reflect beast's laser back at itself",
+          condition: () => state.inventory.includes('Astral Mirror'),
+          target: "winMirror"
+        },
+        {
+          title: "⚡ Path 5: Discharge Storm Orb",
+          sub: "Paralyze boss with high-voltage storm",
+          condition: () => state.inventory.includes('Storm Orb'),
+          target: "winStorm"
+        },
+        {
+          title: "🪄 Path 6: Banish with Spatial Wand",
+          sub: "Open rift to collapse shadow core",
+          condition: () => state.inventory.includes('Spatial Wand'),
+          target: "winSpatial"
+        },
+        {
+          title: "💥 Direct Bare Hand Attack",
+          sub: "Suffer severe damage without proper gear",
+          action: () => {
+            state.hp -= 50;
+            logAction("Direct attack failed! Took 50 Damage!");
+          },
+          target: "damageTaken"
         }
-        options.push({ text: "⚔️ Attempt to fight the shadow beast with magic bolts", target: "die" });
-        return options;
-      }
-    },
-    die: {
-      speaker: "Narrator",
-      title: "Defeat",
-      avatar: "💀",
-      text: "Your magic bolts bounce harmlessly off the shadow beast's dark armor. You have fallen...",
-      choices: [
-        { text: "🔄 Restart Game", target: "start" }
       ]
     },
-    win: {
-      speaker: "High Priestess Lyra",
-      title: "Guardian of the Astral Plane",
-      avatar: "✨",
-      text: "The Phoenix Tear blazes with pure holy fire, purifying the shadow beast and curing the World Tree! You win!",
-      choices: [
-        { text: "🏆 Play Again", target: "start" }
+
+    damageTaken: {
+      name: "Shadow Beast",
+      nameClass: "name-boss",
+      role: "Temporal Distortion Boss",
+      bg: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=1000&q=80",
+      text: () => state.hp <= 0 ? "You have fallen in battle! The temporal rift consumes your essence..." : `You took severe damage! Remaining HP: ${state.hp}/${state.maxHp}. You are thrown back across time!`,
+      choices: () => state.hp <= 0 ? [
+        { title: "💀 Defeat - Reset Timeline", sub: "Try again from start", target: "restart" }
+      ] : [
+        { title: "🩹 Fall Back to Forest", sub: "Gather items before returning", target: "forest" },
+        { title: "⛰️ Retreat to Mountain", sub: "Forge gear with Ignis", target: "ignis" }
       ]
+    },
+
+    winBlade: {
+      name: "Victory - Fire Slayer",
+      nameClass: "name-victory",
+      role: "Phoenix Ending",
+      bg: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80",
+      text: "VICTORY! The Phoenix Blade ignites the temporal rift, cleansing the Shadow Beast with sacred flame!",
+      choices: [{ title: "🔄 Restart Adventure", sub: "Reset timeline", target: "restart" }]
+    },
+
+    winTrap: {
+      name: "Victory - Chrono Lock",
+      nameClass: "name-victory",
+      role: "Tesseract Ending",
+      bg: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80",
+      text: "VICTORY! The Chrono Trap snaps shut, sealing the Shadow Beast in a 4D tesseract time loop forever!",
+      choices: [{ title: "🔄 Restart Adventure", sub: "Reset timeline", target: "restart" }]
+    },
+
+    winHarp: {
+      name: "Victory - Celestial Harmony",
+      nameClass: "name-victory",
+      role: "Song Ending",
+      bg: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80",
+      text: "VICTORY! The music calms the rift and transforms the Shadow Beast into a loyal Astral Pet!",
+      choices: [{ title: "🔄 Restart Adventure", sub: "Reset timeline", target: "restart" }]
+    },
+
+    winMirror: {
+      name: "Victory - Reflection",
+      nameClass: "name-victory",
+      role: "Mirror Ending",
+      bg: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80",
+      text: "VICTORY! The Astral Mirror reflects the beam back into the beast's core, dissolving its darkness completely!",
+      choices: [{ title: "🔄 Restart Adventure", sub: "Reset timeline", target: "restart" }]
+    },
+
+    winStorm: {
+      name: "Victory - Storm Sovereign",
+      nameClass: "name-victory",
+      role: "Lightning Ending",
+      bg: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80",
+      text: "VICTORY! Lightning blasts from the Storm Orb, vaporizing the Shadow Beast into electric mist!",
+      choices: [{ title: "🔄 Restart Adventure", sub: "Reset timeline", target: "restart" }]
+    },
+
+    winSpatial: {
+      name: "Victory - Spatial Banishment",
+      nameClass: "name-victory",
+      role: "Void Warp Ending",
+      bg: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80",
+      text: "VICTORY! The Spatial Wand tears open a wormhole, banishing the Shadow Beast to the outer abyss!",
+      choices: [{ title: "🔄 Restart Adventure", sub: "Reset timeline", target: "restart" }]
     }
   };
 
-  function updateUI() {
-    document.getElementById('manaVal').textContent = gameState.mana;
-    document.getElementById('gemsVal').textContent = gameState.gems;
-    document.getElementById('artifactVal').textContent = gameState.artifact;
-  }
+  function loadScene(key) {
+    if (key === 'restart') {
+      state.hp = 100;
+      state.maxHp = 100;
+      state.mana = 100;
+      state.maxMana = 100;
+      state.gems = 0;
+      state.level = 1;
+      state.exp = 0;
+      state.inventory = [];
+      logAction("Timeline fully restarted.");
+      key = 'start';
+    }
 
-  function renderScene(sceneKey) {
-    gameState.currentScene = sceneKey;
-    const scene = story[sceneKey];
+    const scene = scenes[key];
     if (scene.onEnter) scene.onEnter();
-    updateUI();
 
-    document.getElementById('speakerName').textContent = scene.speaker;
-    document.getElementById('speakerTitle').textContent = scene.title;
-    document.getElementById('avatarIcon').textContent = scene.avatar;
-    document.getElementById('storyText').textContent = scene.text;
+    updateHUD();
+
+    const charNameElem = document.getElementById('charName');
+    charNameElem.textContent = scene.name;
+    charNameElem.className = scene.nameClass || '';
+
+    document.getElementById('charRole').textContent = scene.role;
+    document.getElementById('charBanner').style.backgroundImage = `url('${scene.bg}')`;
+
+    const textVal = typeof scene.text === 'function' ? scene.text() : scene.text;
+    document.getElementById('storyText').textContent = textVal;
 
     const choicesBox = document.getElementById('choicesBox');
     choicesBox.innerHTML = '';
 
     const currentChoices = typeof scene.choices === 'function' ? scene.choices() : scene.choices;
 
-    currentChoices.forEach(choice => {
+    currentChoices.forEach(c => {
+      if (c.condition && !c.condition()) return;
+
       const btn = document.createElement('button');
-      btn.className = 'choice-btn';
-      btn.textContent = choice.text;
-      btn.onclick = () => renderScene(choice.target);
+      btn.className = 'btn-choice';
+      btn.innerHTML = `${c.title} <span class="subtext">${c.sub}</span>`;
+      btn.onclick = () => {
+        if (c.action) c.action();
+        loadScene(c.target);
+      };
       choicesBox.appendChild(btn);
     });
   }
 
-  // Initial Launch
-  renderScene('start');
+  loadScene('start');
 </script>
 </body>
 </html>
