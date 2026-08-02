@@ -1,17 +1,18 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Realm of Shadows - Story Adventure</title>
+  <title>Neon Infiltration - Sci-Fi Adventure</title>
   
   <style>
     :root {
-      --bg: #0b0f19;
-      --card: #182232;
-      --accent: #f59e0b;
+      --bg: #090d16;
+      --card: #131c2e;
+      --accent: #00f0ff;
       --text: #f3f4f6;
-      --sub: #9ca3af;
-      --danger: #ef4444;
+      --sub: #8b9bb4;
+      --danger: #ff2a6d;
     }
 
     * {
@@ -32,27 +33,64 @@
 
     .game-card {
       background: var(--card);
-      border: 2px solid #233248;
+      border: 2px solid #1e2d4a;
       border-radius: 16px;
       padding: 2rem;
       width: 100%;
       max-width: 550px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      box-shadow: 0 10px 30px rgba(0, 240, 255, 0.15);
     }
 
     .stats-bar {
       display: flex;
       justify-content: space-between;
-      background: #0f172a;
+      background: #0a111e;
       padding: 10px 15px;
       border-radius: 10px;
       font-weight: bold;
       margin-bottom: 1.2rem;
       font-size: 0.95rem;
+      border: 1px solid #1a273e;
     }
 
     .stat {
       color: var(--accent);
+    }
+
+    .character-box {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: #0a111e;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 1.2rem;
+      border: 1px solid #1a273e;
+    }
+
+    .avatar-frame {
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      background: #131c2e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2.2rem;
+      border: 2px solid var(--accent);
+      flex-shrink: 0;
+    }
+
+    .character-info h4 {
+      margin: 0 0 4px 0;
+      color: var(--accent);
+      font-size: 1.1rem;
+    }
+
+    .character-info p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--sub);
     }
 
     .story-text {
@@ -70,9 +108,9 @@
     }
 
     .choice-btn {
-      background: #233248;
+      background: #18253d;
       color: var(--text);
-      border: 1px solid #3b82f6;
+      border: 1px solid var(--accent);
       padding: 12px 16px;
       border-radius: 8px;
       text-align: left;
@@ -83,8 +121,9 @@
     }
 
     .choice-btn:hover {
-      background: #3b82f6;
-      color: #fff;
+      background: var(--accent);
+      color: #090d16;
+      font-weight: bold;
     }
 
     .btn-reset {
@@ -106,134 +145,207 @@
   <div class="game-card">
     <!-- PLAYER STATS HEADER -->
     <div class="stats-bar">
-      <div>❤️ HP: <span id="hp" class="stat">100</span></div>
-      <div>🪙 Gold: <span id="gold" class="stat">0</span></div>
-      <div>🎒 Item: <span id="item" class="stat">None</span></div>
+      <div>🔋 Shield: <span id="hp" class="stat">100</span></div>
+      <div>💾 Data: <span id="gold" class="stat">0</span></div>
+      <div>🔧 Tool: <span id="item" class="stat">None</span></div>
+    </div>
+
+    <!-- CHARACTER DISPLAY AREA -->
+    <div class="character-box">
+      <div id="characterAvatar" class="avatar-frame">🤖</div>
+      <div class="character-info">
+        <h4 id="characterName">KEX-7</h4>
+        <p id="characterRole">AI Operator</p>
+      </div>
     </div>
 
     <!-- MAIN STORY CONTENT -->
-    <div id="storyText" class="story-text">Loading story...</div>
+    <div id="storyText" class="story-text">Loading simulation...</div>
     
     <!-- CHOICE BUTTONS -->
     <div id="choicesContainer" class="choices"></div>
     
     <!-- RESTART BUTTON -->
-    <button id="resetBtn" class="btn-reset" onclick="startGame()">🔄 Restart Story</button>
+    <button id="resetBtn" class="btn-reset" onclick="startGame()">🔄 Reboot Mission</button>
   </div>
 
   <script>
+    // SOUND EFFECTS SYNTHESIZER (Web Audio API)
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+
+    function playSound(type) {
+      if (!audioCtx) audioCtx = new AudioCtx();
+      
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      const now = audioCtx.currentTime;
+
+      if (type === 'click') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      } else if (type === 'hit') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(200, now);
+        osc.frequency.linearRampToValueAtTime(30, now + 0.3);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      } else if (type === 'heal') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.linearRampToValueAtTime(800, now + 0.2);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      } else if (type === 'win') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.setValueAtTime(554.37, now + 0.12);
+        osc.frequency.setValueAtTime(659.25, now + 0.24);
+        osc.frequency.setValueAtTime(880, now + 0.36);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.6);
+        osc.start(now);
+        osc.stop(now + 0.6);
+      }
+    }
+
     let gameState = {};
 
     const storyData = {
       start: {
-        text: "You wake up at the entrance of a dark, ancient forest. A rusty sword lies on the ground beside a glowing stone pathway.",
+        character: { name: "KEX-7", role: "AI Operator", avatar: "🤖" },
+        text: "You drop onto the rooftop of NovaTech Spire. KEX-7 pings your HUD: 'Agent, we need that master code from the central vault. Pick an entry route.'",
         choices: [
           { 
-            text: "⚔️ Pick up the rusty sword and enter the dark woods", 
-            next: "forest", 
-            action: () => { gameState.item = "Rusty Sword"; } 
+            text: "🔌 Hack the rooftop maintenance terminal", 
+            next: "terminal", 
+            sound: "click",
+            action: () => { gameState.item = "Security Cipher"; } 
           },
           { 
-            text: "✨ Follow the glowing stone pathway", 
-            next: "pathway" 
+            text: "🪟 Drop down the glass elevator shaft", 
+            next: "shaft",
+            sound: "click"
           }
         ]
       },
-      forest: {
-        text: "Deep in the woods, a snarling Goblin steps out from behind a tree demanding your gold!",
+      terminal: {
+        character: { name: "Viper", role: "Rival Hacker", avatar: "🕶️" },
+        text: "You bypass the security grid, but Viper intercept-hacks your connection! She demands 50 Credits worth of data to let you through.",
         choices: [
           { 
-            text: "⚔️ Fight the Goblin with your sword", 
-            next: "goblinFight", 
-            condition: () => gameState.item === "Rusty Sword" 
+            text: "💻 Counter-hack her system with your Cipher", 
+            next: "hackFight", 
+            sound: "hit",
+            condition: () => gameState.item === "Security Cipher" 
           },
           { 
-            text: "🏃 Run away back to the entrance", 
-            next: "start" 
+            text: "🏃 Abort hack and retreat to rooftop", 
+            next: "start",
+            sound: "click"
           },
           { 
-            text: "💰 Offer to pay him", 
-            next: "goblinPay" 
+            text: "⚡ Force bypass her firewall", 
+            next: "shockTrap", 
+            sound: "hit"
           }
         ]
       },
-      goblinFight: {
-        text: "You swing your rusty sword! After a tough battle, you slay the goblin and find 20 Gold coins in his pouch.",
+      hackFight: {
+        character: { name: "KEX-7", role: "AI Operator", avatar: "🤖" },
+        text: "Your Cipher destroys Viper's connection! You siphon 50 Data fragments from her network and unlock the floor level access.",
         choices: [
-          { text: "🏆 Continue deeper into the castle ahead", next: "castle" }
+          { text: "🏢 Proceed to the Vault floor", next: "vaultFloor", sound: "click" }
         ],
         action: () => {
-          gameState.gold += 20;
-          gameState.hp -= 15;
+          gameState.gold += 50;
+          gameState.hp -= 10;
         }
       },
-      goblinPay: {
-        text: "You have no gold to offer! The angry goblin attacks you before fleeing.",
+      shockTrap: {
+        character: { name: "Viper", role: "Rival Hacker", avatar: "🕶️" },
+        text: "Viper triggers an electrical feedback pulse! Your shield takes heavy damage before you escape her trap.",
         choices: [
-          { text: "🤕 Limp toward the castle ahead", next: "castle" }
+          { text: "🤕 Stumble into the elevator shaft", next: "shaft", sound: "click" }
         ],
         action: () => {
-          gameState.hp -= 40;
+          gameState.hp -= 45;
         }
       },
-      pathway: {
-        text: "The glowing pathway leads you to a peaceful shrine. An altar glows with restoration magic.",
+      shaft: {
+        character: { name: "NEXUS Tech", role: "Repair Bot", avatar: "🔧" },
+        text: "You slide down into a service bay where a friendly NEXUS repair bot offers shield calibration.",
         choices: [
-          { text: "🙏 Pray at the altar", next: "shrineHeal" },
-          { text: "🏰 Head toward the distant castle towers", next: "castle" }
+          { text: "⚡ Recharge shield at station", next: "recharge", sound: "heal" },
+          { text: "🚪 Bypass station toward Vault floor", next: "vaultFloor", sound: "click" }
         ]
       },
-      shrineHeal: {
-        text: "A warm light fills you. You feel completely healed and find a Golden Key on the altar!",
+      recharge: {
+        character: { name: "NEXUS Tech", role: "Repair Bot", avatar: "🔧" },
+        text: "The station restores your shield to 100% and prints an Overdrive Pass for your HUD!",
         choices: [
           { 
-            text: "🔑 Take the Golden Key and head to the castle", 
-            next: "castle", 
-            action: () => { gameState.item = "Golden Key"; } 
+            text: "💳 Take Overdrive Pass & head to Vault", 
+            next: "vaultFloor", 
+            sound: "click",
+            action: () => { gameState.item = "Overdrive Pass"; } 
           }
         ],
         action: () => {
           gameState.hp = 100;
         }
       },
-      castle: {
-        text: "You arrive at the colossal Castle Gates. A heavy iron lock holds the doors shut.",
+      vaultFloor: {
+        character: { name: "Titan Drone", role: "Vault Sentinel", avatar: "🛰️" },
+        text: "You reach the Central Core. A massive Titan Sentinel Drone blocks the main vault door with blast shields raised.",
         choices: [
           { 
-            text: "🔑 Use the Golden Key to unlock the gate", 
+            text: "💳 Swipe Overdrive Pass to override drone", 
             next: "win", 
-            condition: () => gameState.item === "Golden Key" 
+            sound: "win",
+            condition: () => gameState.item === "Overdrive Pass" 
           },
           { 
-            text: "⚔️ Force the gate open with your sword", 
-            next: "forceGate", 
-            condition: () => gameState.item === "Rusty Sword" 
+            text: "💻 Use Security Cipher to shut down drone", 
+            next: "cipherWin", 
+            sound: "win",
+            condition: () => gameState.item === "Security Cipher" 
           },
           { 
-            text: "🚪 Try to climb over the gate", 
-            next: "climbGate" 
+            text: "💥 Sprint straight past the drone lasers", 
+            next: "laserDeath",
+            sound: "hit"
           }
         ]
       },
-      climbGate: {
-        text: "You slip off the sharp iron spikes and fall down hard! You didn't survive the drop.",
+      laserDeath: {
+        character: { name: "Titan Drone", role: "Vault Sentinel", avatar: "💥" },
+        text: "The Titan Drone targets your signature and unleashes a plasma barrage. Shield offline!",
         choices: [],
         action: () => {
           gameState.hp = 0;
         }
       },
-      forceGate: {
-        text: "Your sword snaps, but you manage to bash the latch open and squeeze inside!",
-        choices: [
-          { text: "🏰 Enter the treasure room!", next: "win" }
-        ],
-        action: () => {
-          gameState.hp -= 20;
-          gameState.item = "Broken Sword";
-        }
+      cipherWin: {
+        character: { name: "KEX-7", role: "AI Operator", avatar: "🤖" },
+        text: "🎉 You inject the Cipher into the drone's core, locking the vault open! You download the master payload. MISSION COMPLETE!",
+        choices: []
       },
       win: {
-        text: "🎉 You made it inside the Castle Treasure Room and discovered endless riches! YOU WIN!",
+        character: { name: "KEX-7", role: "AI Operator", avatar: "👑" },
+        text: "🎉 The Overdrive Pass grants full root access! You secure the vault data and extract clean. YOU WIN!",
         choices: []
       }
     };
@@ -251,11 +363,19 @@
       if (scene.action) scene.action();
       updateStats();
 
+      // Update Character Card
+      if (scene.character) {
+        document.getElementById('characterName').textContent = scene.character.name;
+        document.getElementById('characterRole').textContent = scene.character.role;
+        document.getElementById('characterAvatar').textContent = scene.character.avatar;
+      }
+
       // Check for Game Over
       if (gameState.hp <= 0) {
         gameState.hp = 0;
         updateStats();
-        document.getElementById('storyText').textContent = "☠️ GAME OVER! You ran out of health.";
+        playSound('hit');
+        document.getElementById('storyText').textContent = "☠️ CRITICAL FAILURE! System compromised.";
         document.getElementById('choicesContainer').innerHTML = "";
         document.getElementById('resetBtn').style.display = "block";
         return;
@@ -276,7 +396,10 @@
         const btn = document.createElement('button');
         btn.className = 'choice-btn';
         btn.textContent = c.text;
-        btn.onclick = () => showScene(c.next);
+        btn.onclick = () => {
+          if (c.sound) playSound(c.sound);
+          showScene(c.next);
+        };
         container.appendChild(btn);
       });
     }
@@ -284,6 +407,7 @@
     function startGame() {
       gameState = { hp: 100, gold: 0, item: "None" };
       document.getElementById('resetBtn').style.display = "none";
+      playSound('click');
       showScene('start');
     }
 
