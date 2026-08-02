@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Neon Infiltration - Sci-Fi Adventure</title>
+  <title>The Crystal Sanctuary - Magic Adventure</title>
   
   <style>
     :root {
-      --bg: #090d16;
-      --card: #131c2e;
-      --accent: #00f0ff;
+      --bg: #090e17;
+      --glow: rgba(147, 51, 234, 0.3);
+      --card: #131b2e;
+      --accent: #a855f7;
       --text: #f3f4f6;
-      --sub: #8b9bb4;
-      --danger: #ff2a6d;
+      --sub: #9ca3af;
+      --danger: #dc2626;
     }
 
     * {
@@ -21,7 +22,7 @@
 
     body {
       margin: 0;
-      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-family: 'Georgia', serif;
       background: var(--bg);
       color: var(--text);
       display: flex;
@@ -29,50 +30,71 @@
       align-items: center;
       min-height: 100vh;
       padding: 1rem;
+      transition: background 0.8s ease;
     }
 
     .game-card {
       background: var(--card);
-      border: 2px solid #1e2d4a;
-      border-radius: 16px;
+      border: 2px solid #2e1065;
+      border-radius: 18px;
       padding: 2rem;
       width: 100%;
-      max-width: 550px;
-      box-shadow: 0 10px 30px rgba(0, 240, 255, 0.15);
+      max-width: 580px;
+      box-shadow: 0 0 35px var(--glow);
+      transition: box-shadow 0.8s ease;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
     }
 
     .stats-bar {
       display: flex;
-      justify-content: space-between;
-      background: #0a111e;
-      padding: 10px 15px;
+      gap: 15px;
+      background: #060911;
+      padding: 8px 15px;
       border-radius: 10px;
       font-weight: bold;
-      margin-bottom: 1.2rem;
-      font-size: 0.95rem;
-      border: 1px solid #1a273e;
+      font-size: 0.9rem;
+      border: 1px solid #2e1065;
+      flex-grow: 1;
     }
 
     .stat {
       color: var(--accent);
     }
 
+    .music-btn {
+      background: #2e1065;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.85rem;
+      margin-left: 10px;
+    }
+
     .character-box {
       display: flex;
       align-items: center;
       gap: 15px;
-      background: #0a111e;
+      background: #060911;
       padding: 12px;
       border-radius: 12px;
       margin-bottom: 1.2rem;
-      border: 1px solid #1a273e;
+      border: 1px solid #2e1065;
     }
 
     .avatar-frame {
       width: 65px;
       height: 65px;
       border-radius: 50%;
-      background: #131c2e;
+      background: #131b2e;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -98,7 +120,7 @@
       line-height: 1.6;
       color: #e5e7eb;
       margin-bottom: 1.5rem;
-      min-height: 80px;
+      min-height: 90px;
     }
 
     .choices {
@@ -108,7 +130,7 @@
     }
 
     .choice-btn {
-      background: #18253d;
+      background: #1e1b4b;
       color: var(--text);
       border: 1px solid var(--accent);
       padding: 12px 16px;
@@ -122,7 +144,7 @@
 
     .choice-btn:hover {
       background: var(--accent);
-      color: #090d16;
+      color: #090e17;
       font-weight: bold;
     }
 
@@ -130,7 +152,7 @@
       background: var(--danger);
       color: white;
       border: none;
-      padding: 10px;
+      padding: 12px;
       border-radius: 8px;
       font-weight: bold;
       width: 100%;
@@ -142,210 +164,286 @@
 </head>
 <body>
 
-  <div class="game-card">
-    <!-- PLAYER STATS HEADER -->
-    <div class="stats-bar">
-      <div>🔋 Shield: <span id="hp" class="stat">100</span></div>
-      <div>💾 Data: <span id="gold" class="stat">0</span></div>
-      <div>🔧 Tool: <span id="item" class="stat">None</span></div>
+  <div class="game-card" id="gameCard">
+    <!-- STATS AND MUSIC TOGGLE -->
+    <div class="header-bar">
+      <div class="stats-bar">
+        <div>✨ Mana: <span id="hp" class="stat">100</span></div>
+        <div>🪙 Gems: <span id="gold" class="stat">0</span></div>
+        <div>📜 Artifact: <span id="item" class="stat">None</span></div>
+      </div>
+      <button class="music-btn" id="musicBtn" onclick="toggleMusic()">🎵 Music: OFF</button>
     </div>
 
-    <!-- CHARACTER DISPLAY AREA -->
+    <!-- CHARACTER CONTAINER -->
     <div class="character-box">
-      <div id="characterAvatar" class="avatar-frame">🤖</div>
+      <div id="characterAvatar" class="avatar-frame">🧙‍♀️</div>
       <div class="character-info">
-        <h4 id="characterName">KEX-7</h4>
-        <p id="characterRole">AI Operator</p>
+        <h4 id="characterName">High Priestess Lyra</h4>
+        <p id="characterRole">Guardian of the Astral Plane</p>
       </div>
     </div>
 
-    <!-- MAIN STORY CONTENT -->
-    <div id="storyText" class="story-text">Loading simulation...</div>
+    <!-- MAIN STORY DISPLAY -->
+    <div id="storyText" class="story-text">Chanting ancient incantations...</div>
     
     <!-- CHOICE BUTTONS -->
     <div id="choicesContainer" class="choices"></div>
     
-    <!-- RESTART BUTTON -->
-    <button id="resetBtn" class="btn-reset" onclick="startGame()">🔄 Reboot Mission</button>
+    <!-- RESET BUTTON -->
+    <button id="resetBtn" class="btn-reset" onclick="startGame()">🔄 Begin Quest Again</button>
   </div>
 
   <script>
-    // SOUND EFFECTS SYNTHESIZER (Web Audio API)
+    // AUDIO SYNTHESIZER (SYNTH MUSIC & SFX)
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx;
+    let isMusicPlaying = false;
+    let musicInterval;
+
+    function initAudio() {
+      if (!audioCtx) audioCtx = new AudioCtx();
+    }
 
     function playSound(type) {
-      if (!audioCtx) audioCtx = new AudioCtx();
-      
+      initAudio();
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.connect(gain);
       gain.connect(audioCtx.destination);
-
       const now = audioCtx.currentTime;
 
       if (type === 'click') {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(600, now);
-        osc.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
-        gain.gain.setValueAtTime(0.1, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523.25, now); // C5 note
+        osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.08); // C6 note
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
         osc.start(now);
-        osc.stop(now + 0.05);
+        osc.stop(now + 0.08);
       } else if (type === 'hit') {
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(200, now);
+        osc.frequency.setValueAtTime(120, now);
         osc.frequency.linearRampToValueAtTime(30, now + 0.3);
-        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.setValueAtTime(0.2, now);
         gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
         osc.start(now);
         osc.stop(now + 0.3);
       } else if (type === 'heal') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(400, now);
-        osc.frequency.linearRampToValueAtTime(800, now + 0.2);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
-        osc.start(now);
-        osc.stop(now + 0.2);
-      } else if (type === 'win') {
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(440, now);
-        osc.frequency.setValueAtTime(554.37, now + 0.12);
-        osc.frequency.setValueAtTime(659.25, now + 0.24);
-        osc.frequency.setValueAtTime(880, now + 0.36);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.6);
+        osc.frequency.linearRampToValueAtTime(880, now + 0.3);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
         osc.start(now);
-        osc.stop(now + 0.6);
+        osc.stop(now + 0.3);
+      }
+    }
+
+    // Mystical Ambience Loop
+    function toggleMusic() {
+      initAudio();
+      const btn = document.getElementById('musicBtn');
+
+      if (isMusicPlaying) {
+        clearInterval(musicInterval);
+        isMusicPlaying = false;
+        btn.textContent = "🎵 Music: OFF";
+      } else {
+        isMusicPlaying = true;
+        btn.textContent = "🎵 Music: ON";
+        let step = 0;
+        const notes = [174.61, 220.00, 261.63, 329.63]; // F, A, C, E magic scale
+
+        musicInterval = setInterval(() => {
+          if (!isMusicPlaying) return;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(notes[step % notes.length], audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.6);
+          step++;
+        }, 600);
       }
     }
 
     let gameState = {};
 
     const storyData = {
+      // --- ACT 1: ENCHANTED FOREST ---
       start: {
-        character: { name: "KEX-7", role: "AI Operator", avatar: "🤖" },
-        text: "You drop onto the rooftop of NovaTech Spire. KEX-7 pings your HUD: 'Agent, we need that master code from the central vault. Pick an entry route.'",
+        bg: "#090e17",
+        glow: "rgba(147, 51, 234, 0.3)",
+        character: { name: "High Priestess Lyra", role: "Guardian of the Astral Plane", avatar: "🧙‍♀️" },
+        text: "High Priestess Lyra summons you into the Moonlit Grove. 'Dark shadow magic has corrupted the World Tree. Take this Starlight Scroll and enter the forest.'",
         choices: [
           { 
-            text: "🔌 Hack the rooftop maintenance terminal", 
-            next: "terminal", 
+            text: "🌲 Follow the Glowing Mushroom Path into the woods", 
+            next: "grove", 
             sound: "click",
-            action: () => { gameState.item = "Security Cipher"; } 
+            action: () => { gameState.item = "Starlight Scroll"; } 
           },
           { 
-            text: "🪟 Drop down the glass elevator shaft", 
-            next: "shaft",
-            sound: "click"
+            text: "⛰️ Climb the Mist Mountains to speak with the Alchemist", 
+            next: "alchemist" 
           }
         ]
       },
-      terminal: {
-        character: { name: "Viper", role: "Rival Hacker", avatar: "🕶️" },
-        text: "You bypass the security grid, but Viper intercept-hacks your connection! She demands 50 Credits worth of data to let you through.",
+      alchemist: {
+        bg: "#160b1e",
+        glow: "rgba(217, 70, 239, 0.3)",
+        character: { name: "Master Ignis", role: "Potion Master", avatar: "🧪" },
+        text: "In his mountain hut, Master Ignis stirs a cauldron. 'I can forge you a Phoenix Tear, but it costs 30 Gems—or I will trade it for your Starlight Scroll.'",
         choices: [
           { 
-            text: "💻 Counter-hack her system with your Cipher", 
-            next: "hackFight", 
-            sound: "hit",
-            condition: () => gameState.item === "Security Cipher" 
+            text: "📜 Trade Starlight Scroll for Phoenix Tear", 
+            next: "tradeTear", 
+            sound: "click",
+            condition: () => gameState.item === "Starlight Scroll" 
           },
           { 
-            text: "🏃 Abort hack and retreat to rooftop", 
-            next: "start",
-            sound: "click"
+            text: "🪙 Buy Phoenix Tear for 30 Gems", 
+            next: "buyTear", 
+            sound: "click",
+            condition: () => gameState.gold >= 30 
           },
           { 
-            text: "⚡ Force bypass her firewall", 
-            next: "shockTrap", 
-            sound: "hit"
+            text: "🏃 Leave the hut and dive into the Moonlit Grove", 
+            next: "grove", 
+            sound: "click" 
           }
         ]
       },
-      hackFight: {
-        character: { name: "KEX-7", role: "AI Operator", avatar: "🤖" },
-        text: "Your Cipher destroys Viper's connection! You siphon 50 Data fragments from her network and unlock the floor level access.",
+      tradeTear: {
+        bg: "#160b1e",
+        glow: "rgba(217, 70, 239, 0.3)",
+        character: { name: "Master Ignis", role: "Potion Master", avatar: "🧪" },
+        text: "Ignis smiles warmly, taking the scroll. 'A fair exchange! Take this glowing bottle and 20 extra Mana Gems.'",
         choices: [
-          { text: "🏢 Proceed to the Vault floor", next: "vaultFloor", sound: "click" }
+          { text: "🌲 Enter the Deep Woods", next: "grove", sound: "click" }
+        ],
+        action: () => {
+          gameState.gold += 20;
+          gameState.item = "Phoenix Tear";
+        }
+      },
+      grove: {
+        bg: "#041710",
+        glow: "rgba(16, 185, 129, 0.3)",
+        character: { name: "Sylph the Fairy", role: "Forest Sprite", avatar: "🧚" },
+        text: "A glowing fairy named Sylph flits around your head. 'A shadow beast guards the ancient bridge ahead! How will you cross?'",
+        choices: [
+          { 
+            text: "📜 Read the Starlight Scroll to blind the beast with holy light", 
+            next: "beastScrollWin", 
+            sound: "heal",
+            condition: () => gameState.item === "Starlight Scroll" 
+          },
+          { 
+            text: "🧪 Splash the Phoenix Tear to burn away the shadow", 
+            next: "beastTearWin", 
+            sound: "heal",
+            condition: () => gameState.item === "Phoenix Tear" 
+          },
+          { 
+            text: "⚔️ Attempt to fight the shadow beast with magic bolts", 
+            next: "beastFight", 
+            sound: "hit" 
+          }
+        ]
+      },
+      beastScrollWin: {
+        bg: "#041710",
+        glow: "rgba(16, 185, 129, 0.4)",
+        character: { name: "Sylph the Fairy", role: "Forest Sprite", avatar: "✨" },
+        text: "The Starlight Scroll shines like a miniature sun! The shadow beast vanishes into mist, leaving behind 50 Mana Gems.",
+        choices: [
+          { text: "🏰 Enter the World Tree Gate", next: "sanctuaryGate", sound: "click" }
         ],
         action: () => {
           gameState.gold += 50;
-          gameState.hp -= 10;
         }
       },
-      shockTrap: {
-        character: { name: "Viper", role: "Rival Hacker", avatar: "🕶️" },
-        text: "Viper triggers an electrical feedback pulse! Your shield takes heavy damage before you escape her trap.",
+      beastTearWin: {
+        bg: "#041710",
+        glow: "rgba(16, 185, 129, 0.4)",
+        character: { name: "Sylph the Fairy", role: "Forest Sprite", avatar: "✨" },
+        text: "The Phoenix Tear erupts in golden flames! The corruption melts away and your Mana is completely restored.",
         choices: [
-          { text: "🤕 Stumble into the elevator shaft", next: "shaft", sound: "click" }
-        ],
-        action: () => {
-          gameState.hp -= 45;
-        }
-      },
-      shaft: {
-        character: { name: "NEXUS Tech", role: "Repair Bot", avatar: "🔧" },
-        text: "You slide down into a service bay where a friendly NEXUS repair bot offers shield calibration.",
-        choices: [
-          { text: "⚡ Recharge shield at station", next: "recharge", sound: "heal" },
-          { text: "🚪 Bypass station toward Vault floor", next: "vaultFloor", sound: "click" }
-        ]
-      },
-      recharge: {
-        character: { name: "NEXUS Tech", role: "Repair Bot", avatar: "🔧" },
-        text: "The station restores your shield to 100% and prints an Overdrive Pass for your HUD!",
-        choices: [
-          { 
-            text: "💳 Take Overdrive Pass & head to Vault", 
-            next: "vaultFloor", 
-            sound: "click",
-            action: () => { gameState.item = "Overdrive Pass"; } 
-          }
+          { text: "🏰 Enter the World Tree Gate", next: "sanctuaryGate", sound: "click" }
         ],
         action: () => {
           gameState.hp = 100;
         }
       },
-      vaultFloor: {
-        character: { name: "Titan Drone", role: "Vault Sentinel", avatar: "🛰️" },
-        text: "You reach the Central Core. A massive Titan Sentinel Drone blocks the main vault door with blast shields raised.",
+      beastFight: {
+        bg: "#1c0909",
+        glow: "rgba(220, 38, 38, 0.3)",
+        character: { name: "Shadow Wraith", role: "Corrupted Demon", avatar: "👾" },
+        text: "The wraith strikes you with dark magic, draining your vitality! You barely blast past it into the sanctuary.",
+        choices: [
+          { text: "🤕 Stumble into the Sanctuary Gate", next: "sanctuaryGate", sound: "click" }
+        ],
+        action: () => {
+          gameState.hp -= 40;
+        }
+      },
+
+      // --- ACT 2: WORLD TREE SANCTUARY ---
+      sanctuaryGate: {
+        bg: "#180c2e",
+        glow: "rgba(168, 85, 247, 0.4)",
+        character: { name: "Malakor the Void Sorcerer", role: "Master of Shadows", avatar: "🧙‍♂️" },
+        text: "At the heart of the World Tree stands Malakor! He weaves black fire around the tree's crystal core. 'You are too late to stop the ritual!'",
         choices: [
           { 
-            text: "💳 Swipe Overdrive Pass to override drone", 
-            next: "win", 
-            sound: "win",
-            condition: () => gameState.item === "Overdrive Pass" 
+            text: "📜 Cast the Starlight Scroll to cleanse the tree's core", 
+            next: "winScroll", 
+            sound: "heal",
+            condition: () => gameState.item === "Starlight Scroll" 
           },
           { 
-            text: "💻 Use Security Cipher to shut down drone", 
-            next: "cipherWin", 
-            sound: "win",
-            condition: () => gameState.item === "Security Cipher" 
+            text: "🧪 Pour the Phoenix Tear onto Malakor's shadow spell", 
+            next: "winTear", 
+            sound: "heal",
+            condition: () => gameState.item === "Phoenix Tear" 
           },
           { 
-            text: "💥 Sprint straight past the drone lasers", 
-            next: "laserDeath",
-            sound: "hit"
+            text: "🪄 Engage Malakor in a direct magic duel", 
+            next: "magicDeath", 
+            sound: "hit" 
           }
         ]
       },
-      laserDeath: {
-        character: { name: "Titan Drone", role: "Vault Sentinel", avatar: "💥" },
-        text: "The Titan Drone targets your signature and unleashes a plasma barrage. Shield offline!",
+      magicDeath: {
+        bg: "#1a0404",
+        glow: "rgba(220, 38, 38, 0.5)",
+        character: { name: "Malakor the Void Sorcerer", role: "Master of Shadows", avatar: "💀" },
+        text: "Malakor's void spells overwhelm your barrier. Dark magic consumes the realm...",
         choices: [],
         action: () => {
           gameState.hp = 0;
         }
       },
-      cipherWin: {
-        character: { name: "KEX-7", role: "AI Operator", avatar: "🤖" },
-        text: "🎉 You inject the Cipher into the drone's core, locking the vault open! You download the master payload. MISSION COMPLETE!",
+
+      // --- ENDINGS ---
+      winScroll: {
+        bg: "#0a1f18",
+        glow: "rgba(16, 185, 129, 0.6)",
+        character: { name: "High Priestess Lyra", role: "Guardian of the Astral Plane", avatar: "👑" },
+        text: "🎉 The holy light from your scroll purifies the World Tree! Malakor fades away and the magic realm is saved! YOU WIN!",
         choices: []
       },
-      win: {
-        character: { name: "KEX-7", role: "AI Operator", avatar: "👑" },
-        text: "🎉 The Overdrive Pass grants full root access! You secure the vault data and extract clean. YOU WIN!",
+      winTear: {
+        bg: "#0a1f18",
+        glow: "rgba(217, 70, 239, 0.6)",
+        character: { name: "High Priestess Lyra", role: "Guardian of the Astral Plane", avatar: "👑" },
+        text: "🎉 The Phoenix Tear explodes into divine fire, destroying the corruption instantly! You are hailed as the Great Archmage! YOU WIN!",
         choices: []
       }
     };
@@ -363,7 +461,11 @@
       if (scene.action) scene.action();
       updateStats();
 
-      // Update Character Card
+      // Update background and glow
+      if (scene.bg) document.body.style.background = scene.bg;
+      if (scene.glow) document.getElementById('gameCard').style.setProperty('--glow', scene.glow);
+
+      // Update character profile
       if (scene.character) {
         document.getElementById('characterName').textContent = scene.character.name;
         document.getElementById('characterRole').textContent = scene.character.role;
@@ -375,7 +477,7 @@
         gameState.hp = 0;
         updateStats();
         playSound('hit');
-        document.getElementById('storyText').textContent = "☠️ CRITICAL FAILURE! System compromised.";
+        document.getElementById('storyText').textContent = "☠️ MANA EXHAUSTED! The dark magic claims your soul.";
         document.getElementById('choicesContainer').innerHTML = "";
         document.getElementById('resetBtn').style.display = "block";
         return;
@@ -406,5 +508,13 @@
 
     function startGame() {
       gameState = { hp: 100, gold: 0, item: "None" };
-      document.getElementById('resetBtn').style.displa
+      document.getElementById('resetBtn').style.display = "none";
+      showScene('start');
+    }
+
+    // Launch game on page load
+    startGame();
+  </script>
+</body>
+</html>
 
