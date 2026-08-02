@@ -3,518 +3,345 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Crystal Sanctuary - Magic Adventure</title>
-  
+  <title>Moonlit Grove RPG</title>
   <style>
-    :root {
-      --bg: #090e17;
-      --glow: rgba(147, 51, 234, 0.3);
-      --card: #131b2e;
-      --accent: #a855f7;
-      --text: #f3f4f6;
-      --sub: #9ca3af;
-      --danger: #dc2626;
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    
+    /* Cosmic Temple Background */
+    body { 
+      background: #0b0c10 url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed; 
+      background-size: cover;
+      color: #c5c6c7; 
+      margin: 0; 
+      padding: 20px; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      min-height: 100vh; 
+    }
+    
+    .game-card { 
+      max-width: 650px; 
+      width: 100%; 
+      background: rgba(15, 12, 29, 0.85); 
+      backdrop-filter: blur(10px);
+      border-radius: 16px; 
+      border: 1px solid rgba(179, 136, 255, 0.4); 
+      padding: 25px; 
+      box-shadow: 0 0 30px rgba(156, 39, 176, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.05); 
+    }
+    
+    .stats-bar { 
+      display: grid; 
+      grid-template-columns: repeat(2, 1fr); 
+      gap: 10px; 
+      background: rgba(11, 12, 16, 0.8); 
+      padding: 12px 18px; 
+      border-radius: 10px; 
+      border: 1px solid rgba(179, 136, 255, 0.3); 
+      margin-bottom: 20px; 
+      font-weight: 600; 
+      font-size: 0.95rem; 
+    }
+    .stat-item { display: flex; align-items: center; gap: 6px; }
+    .stat-value { color: #d1c4e9; }
+    
+    .timer-box { 
+      grid-column: span 2; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      background: rgba(42, 26, 66, 0.6); 
+      padding: 8px 12px; 
+      border-radius: 8px; 
+      border: 1px solid #b388ff; 
+      margin-top: 5px; 
+    }
+    .gem-btn { 
+      background: #7c4dff; 
+      color: #fff; 
+      border: none; 
+      padding: 6px 12px; 
+      border-radius: 6px; 
+      font-weight: bold; 
+      cursor: pointer; 
+      transition: 0.2s; 
+    }
+    .gem-btn:hover:not(:disabled) { background: #651fff; transform: scale(1.03); }
+    .gem-btn:disabled { background: #333; color: #777; cursor: not-allowed; }
+
+    .audio-btn { 
+      background: rgba(31, 40, 51, 0.8); 
+      color: #b388ff; 
+      border: 1px solid #b388ff; 
+      padding: 4px 8px; 
+      border-radius: 6px; 
+      cursor: pointer; 
     }
 
-    * {
-      box-sizing: border-box;
+    .character-box { 
+      display: flex; 
+      align-items: center; 
+      gap: 12px; 
+      background: rgba(11, 12, 16, 0.8); 
+      padding: 12px; 
+      border-radius: 10px; 
+      margin-bottom: 15px; 
+      border-left: 4px solid #b388ff; 
     }
-
-    body {
-      margin: 0;
-      font-family: 'Georgia', serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 1rem;
-      transition: background 0.8s ease;
+    .avatar { 
+      width: 45px; 
+      height: 45px; 
+      background: #7c4dff; 
+      border-radius: 50%; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-size: 1.4rem; 
     }
+    .char-info h3 { margin: 0; color: #d1c4e9; font-size: 1.1rem; }
+    .char-info p { margin: 2px 0 0 0; color: #9fa8da; font-size: 0.85rem; }
 
-    .game-card {
-      background: var(--card);
-      border: 2px solid #2e1065;
-      border-radius: 18px;
-      padding: 2rem;
-      width: 100%;
-      max-width: 580px;
-      box-shadow: 0 0 35px var(--glow);
-      transition: box-shadow 0.8s ease;
+    .story-text { line-height: 1.6; font-size: 1rem; color: #f3e5f5; margin-bottom: 25px; min-height: 60px; }
+
+    .choices-container { display: flex; flex-direction: column; gap: 12px; }
+    .choice-btn { 
+      background: rgba(18, 11, 36, 0.85); 
+      color: #e1bee7; 
+      border: 1px solid rgba(179, 136, 255, 0.4); 
+      padding: 14px 18px; 
+      border-radius: 10px; 
+      text-align: left; 
+      cursor: pointer; 
+      font-size: 0.95rem; 
+      font-weight: 500; 
+      transition: all 0.2s ease; 
     }
-
-    .header-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    .stats-bar {
-      display: flex;
-      gap: 15px;
-      background: #060911;
-      padding: 8px 15px;
-      border-radius: 10px;
-      font-weight: bold;
-      font-size: 0.9rem;
-      border: 1px solid #2e1065;
-      flex-grow: 1;
-    }
-
-    .stat {
-      color: var(--accent);
-    }
-
-    .music-btn {
-      background: #2e1065;
-      color: var(--accent);
-      border: 1px solid var(--accent);
-      padding: 8px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 0.85rem;
-      margin-left: 10px;
-    }
-
-    .character-box {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      background: #060911;
-      padding: 12px;
-      border-radius: 12px;
-      margin-bottom: 1.2rem;
-      border: 1px solid #2e1065;
-    }
-
-    .avatar-frame {
-      width: 65px;
-      height: 65px;
-      border-radius: 50%;
-      background: #131b2e;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 2.2rem;
-      border: 2px solid var(--accent);
-      flex-shrink: 0;
-    }
-
-    .character-info h4 {
-      margin: 0 0 4px 0;
-      color: var(--accent);
-      font-size: 1.1rem;
-    }
-
-    .character-info p {
-      margin: 0;
-      font-size: 0.85rem;
-      color: var(--sub);
-    }
-
-    .story-text {
-      font-size: 1.05rem;
-      line-height: 1.6;
-      color: #e5e7eb;
-      margin-bottom: 1.5rem;
-      min-height: 90px;
-    }
-
-    .choices {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .choice-btn {
-      background: #1e1b4b;
-      color: var(--text);
-      border: 1px solid var(--accent);
-      padding: 12px 16px;
-      border-radius: 8px;
-      text-align: left;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: 0.2s;
-      font-weight: 500;
-    }
-
-    .choice-btn:hover {
-      background: var(--accent);
-      color: #090e17;
-      font-weight: bold;
-    }
-
-    .btn-reset {
-      background: var(--danger);
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      font-weight: bold;
-      width: 100%;
-      margin-top: 15px;
-      cursor: pointer;
-      display: none;
+    .choice-btn:hover { 
+      background: #7c4dff; 
+      color: #fff; 
+      border-color: #b388ff; 
+      transform: translateY(-2px); 
+      box-shadow: 0 4px 12px rgba(124, 77, 255, 0.4); 
     }
   </style>
 </head>
 <body>
 
-  <div class="game-card" id="gameCard">
-    <!-- STATS AND MUSIC TOGGLE -->
-    <div class="header-bar">
-      <div class="stats-bar">
-        <div>✨ Mana: <span id="hp" class="stat">100</span></div>
-        <div>🪙 Gems: <span id="gold" class="stat">0</span></div>
-        <div>📜 Artifact: <span id="item" class="stat">None</span></div>
-      </div>
-      <button class="music-btn" id="musicBtn" onclick="toggleMusic()">🎵 Music: OFF</button>
-    </div>
-
-    <!-- CHARACTER CONTAINER -->
-    <div class="character-box">
-      <div id="characterAvatar" class="avatar-frame">🧙‍♀️</div>
-      <div class="character-info">
-        <h4 id="characterName">High Priestess Lyra</h4>
-        <p id="characterRole">Guardian of the Astral Plane</p>
-      </div>
-    </div>
-
-    <!-- MAIN STORY DISPLAY -->
-    <div id="storyText" class="story-text">Chanting ancient incantations...</div>
+<div class="game-card">
+  <!-- Top Stats Bar -->
+  <div class="stats-bar">
+    <div class="stat-item">✨ Mana: <span class="stat-value" id="manaVal">100</span></div>
+    <div class="stat-item">💎 Gems: <span class="stat-value" id="gemsVal">0</span></div>
+    <div class="stat-item">📜 Artifact: <span class="stat-value" id="artifactVal">None</span></div>
+    <button class="audio-btn" id="musicBtn">🎵 Music: OFF</button>
     
-    <!-- CHOICE BUTTONS -->
-    <div id="choicesContainer" class="choices"></div>
-    
-    <!-- RESET BUTTON -->
-    <button id="resetBtn" class="btn-reset" onclick="startGame()">🔄 Begin Quest Again</button>
+    <!-- Free Gems Timer System -->
+    <div class="timer-box">
+      <span>⏳ Free Gems in: <strong id="timerVal" style="color:#b388ff;">5s</strong></span>
+      <button class="gem-btn" id="claimGemsBtn" disabled>🎁 Claim +10 Gems</button>
+    </div>
   </div>
 
-  <script>
-    // AUDIO SYNTHESIZER (SYNTH MUSIC & SFX)
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    let audioCtx;
-    let isMusicPlaying = false;
-    let musicInterval;
+  <!-- Speaker Header -->
+  <div class="character-box">
+    <div class="avatar" id="avatarIcon">🔮</div>
+    <div class="char-info">
+      <h3 id="speakerName">High Priestess Lyra</h3>
+      <p id="speakerTitle">Guardian of the Astral Plane</p>
+    </div>
+  </div>
 
-    function initAudio() {
-      if (!audioCtx) audioCtx = new AudioCtx();
+  <!-- Story Text -->
+  <div class="story-text" id="storyText">Loading game...</div>
+
+  <!-- Action Choices -->
+  <div class="choices-container" id="choicesBox"></div>
+</div>
+
+<audio id="bgMusic" loop src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=fantasy-medieval-112992.mp3"></audio>
+
+<script>
+  // Game State
+  const gameState = {
+    mana: 100,
+    gems: 0,
+    artifact: 'Starlight Scroll',
+    currentScene: 'start'
+  };
+
+  // Timer Variables
+  let gemTimer = 5;
+  const claimBtn = document.getElementById('claimGemsBtn');
+  const timerDisplay = document.getElementById('timerVal');
+
+  // Gem Countdown Loop
+  setInterval(() => {
+    if (gemTimer > 0) {
+      gemTimer--;
+      timerDisplay.textContent = `${gemTimer}s`;
+    } else {
+      timerDisplay.textContent = "READY!";
+      claimBtn.disabled = false;
     }
+  }, 1000);
 
-    function playSound(type) {
-      initAudio();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      const now = audioCtx.currentTime;
+  // Claim Gems Button Handler
+  claimBtn.addEventListener('click', () => {
+    gameState.gems += 10;
+    gemTimer = 5;
+    claimBtn.disabled = true;
+    timerDisplay.textContent = `${gemTimer}s`;
+    updateUI();
+    renderScene(gameState.currentScene); // Refresh dynamic shop choices
+  });
 
-      if (type === 'click') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(523.25, now); // C5 note
-        osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.08); // C6 note
-        gain.gain.setValueAtTime(0.08, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
-        osc.start(now);
-        osc.stop(now + 0.08);
-      } else if (type === 'hit') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(120, now);
-        osc.frequency.linearRampToValueAtTime(30, now + 0.3);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
-        osc.start(now);
-        osc.stop(now + 0.3);
-      } else if (type === 'heal') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(440, now);
-        osc.frequency.linearRampToValueAtTime(880, now + 0.3);
-        gain.gain.setValueAtTime(0.12, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
-        osc.start(now);
-        osc.stop(now + 0.3);
-      }
+  // Audio Handler
+  const music = document.getElementById('bgMusic');
+  const musicBtn = document.getElementById('musicBtn');
+  let isPlaying = false;
+
+  musicBtn.addEventListener('click', () => {
+    if (isPlaying) {
+      music.pause();
+      musicBtn.textContent = '🎵 Music: OFF';
+    } else {
+      music.play();
+      musicBtn.textContent = '⏸️ Music: ON';
     }
+    isPlaying = !isPlaying;
+  });
 
-    // Mystical Ambience Loop
-    function toggleMusic() {
-      initAudio();
-      const btn = document.getElementById('musicBtn');
-
-      if (isMusicPlaying) {
-        clearInterval(musicInterval);
-        isMusicPlaying = false;
-        btn.textContent = "🎵 Music: OFF";
-      } else {
-        isMusicPlaying = true;
-        btn.textContent = "🎵 Music: ON";
-        let step = 0;
-        const notes = [174.61, 220.00, 261.63, 329.63]; // F, A, C, E magic scale
-
-        musicInterval = setInterval(() => {
-          if (!isMusicPlaying) return;
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(notes[step % notes.length], audioCtx.currentTime);
-          gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.start();
-          osc.stop(audioCtx.currentTime + 0.6);
-          step++;
-        }, 600);
-      }
-    }
-
-    let gameState = {};
-
-    const storyData = {
-      // --- ACT 1: ENCHANTED FOREST ---
-      start: {
-        bg: "#090e17",
-        glow: "rgba(147, 51, 234, 0.3)",
-        character: { name: "High Priestess Lyra", role: "Guardian of the Astral Plane", avatar: "🧙‍♀️" },
-        text: "High Priestess Lyra summons you into the Moonlit Grove. 'Dark shadow magic has corrupted the World Tree. Take this Starlight Scroll and enter the forest.'",
-        choices: [
-          { 
-            text: "🌲 Follow the Glowing Mushroom Path into the woods", 
-            next: "grove", 
-            sound: "click",
-            action: () => { gameState.item = "Starlight Scroll"; } 
-          },
-          { 
-            text: "⛰️ Climb the Mist Mountains to speak with the Alchemist", 
-            next: "alchemist" 
-          }
-        ]
+  // Story Nodes
+  const story = {
+    start: {
+      speaker: "High Priestess Lyra",
+      title: "Guardian of the Astral Plane",
+      avatar: "🔮",
+      text: "High Priestess Lyra summons you into the Moonlit Grove. 'Dark shadow magic has corrupted the World Tree. Take this Starlight Scroll and enter the forest.'",
+      onEnter: () => {
+        gameState.artifact = 'Starlight Scroll';
       },
-      alchemist: {
-        bg: "#160b1e",
-        glow: "rgba(217, 70, 239, 0.3)",
-        character: { name: "Master Ignis", role: "Potion Master", avatar: "🧪" },
-        text: "In his mountain hut, Master Ignis stirs a cauldron. 'I can forge you a Phoenix Tear, but it costs 30 Gems—or I will trade it for your Starlight Scroll.'",
-        choices: [
-          { 
-            text: "📜 Trade Starlight Scroll for Phoenix Tear", 
-            next: "tradeTear", 
-            sound: "click",
-            condition: () => gameState.item === "Starlight Scroll" 
-          },
-          { 
-            text: "🪙 Buy Phoenix Tear for 30 Gems", 
-            next: "buyTear", 
-            sound: "click",
-            condition: () => gameState.gold >= 30 
-          },
-          { 
-            text: "🏃 Leave the hut and dive into the Moonlit Grove", 
-            next: "grove", 
-            sound: "click" 
-          }
-        ]
-      },
-      tradeTear: {
-        bg: "#160b1e",
-        glow: "rgba(217, 70, 239, 0.3)",
-        character: { name: "Master Ignis", role: "Potion Master", avatar: "🧪" },
-        text: "Ignis smiles warmly, taking the scroll. 'A fair exchange! Take this glowing bottle and 20 extra Mana Gems.'",
-        choices: [
-          { text: "🌲 Enter the Deep Woods", next: "grove", sound: "click" }
-        ],
-        action: () => {
-          gameState.gold += 20;
-          gameState.item = "Phoenix Tear";
-        }
-      },
-      grove: {
-        bg: "#041710",
-        glow: "rgba(16, 185, 129, 0.3)",
-        character: { name: "Sylph the Fairy", role: "Forest Sprite", avatar: "🧚" },
-        text: "A glowing fairy named Sylph flits around your head. 'A shadow beast guards the ancient bridge ahead! How will you cross?'",
-        choices: [
-          { 
-            text: "📜 Read the Starlight Scroll to blind the beast with holy light", 
-            next: "beastScrollWin", 
-            sound: "heal",
-            condition: () => gameState.item === "Starlight Scroll" 
-          },
-          { 
-            text: "🧪 Splash the Phoenix Tear to burn away the shadow", 
-            next: "beastTearWin", 
-            sound: "heal",
-            condition: () => gameState.item === "Phoenix Tear" 
-          },
-          { 
-            text: "⚔️ Attempt to fight the shadow beast with magic bolts", 
-            next: "beastFight", 
-            sound: "hit" 
-          }
-        ]
-      },
-      beastScrollWin: {
-        bg: "#041710",
-        glow: "rgba(16, 185, 129, 0.4)",
-        character: { name: "Sylph the Fairy", role: "Forest Sprite", avatar: "✨" },
-        text: "The Starlight Scroll shines like a miniature sun! The shadow beast vanishes into mist, leaving behind 50 Mana Gems.",
-        choices: [
-          { text: "🏰 Enter the World Tree Gate", next: "sanctuaryGate", sound: "click" }
-        ],
-        action: () => {
-          gameState.gold += 50;
-        }
-      },
-      beastTearWin: {
-        bg: "#041710",
-        glow: "rgba(16, 185, 129, 0.4)",
-        character: { name: "Sylph the Fairy", role: "Forest Sprite", avatar: "✨" },
-        text: "The Phoenix Tear erupts in golden flames! The corruption melts away and your Mana is completely restored.",
-        choices: [
-          { text: "🏰 Enter the World Tree Gate", next: "sanctuaryGate", sound: "click" }
-        ],
-        action: () => {
-          gameState.hp = 100;
-        }
-      },
-      beastFight: {
-        bg: "#1c0909",
-        glow: "rgba(220, 38, 38, 0.3)",
-        character: { name: "Shadow Wraith", role: "Corrupted Demon", avatar: "👾" },
-        text: "The wraith strikes you with dark magic, draining your vitality! You barely blast past it into the sanctuary.",
-        choices: [
-          { text: "🤕 Stumble into the Sanctuary Gate", next: "sanctuaryGate", sound: "click" }
-        ],
-        action: () => {
-          gameState.hp -= 40;
-        }
-      },
-
-      // --- ACT 2: WORLD TREE SANCTUARY ---
-      sanctuaryGate: {
-        bg: "#180c2e",
-        glow: "rgba(168, 85, 247, 0.4)",
-        character: { name: "Malakor the Void Sorcerer", role: "Master of Shadows", avatar: "🧙‍♂️" },
-        text: "At the heart of the World Tree stands Malakor! He weaves black fire around the tree's crystal core. 'You are too late to stop the ritual!'",
-        choices: [
-          { 
-            text: "📜 Cast the Starlight Scroll to cleanse the tree's core", 
-            next: "winScroll", 
-            sound: "heal",
-            condition: () => gameState.item === "Starlight Scroll" 
-          },
-          { 
-            text: "🧪 Pour the Phoenix Tear onto Malakor's shadow spell", 
-            next: "winTear", 
-            sound: "heal",
-            condition: () => gameState.item === "Phoenix Tear" 
-          },
-          { 
-            text: "🪄 Engage Malakor in a direct magic duel", 
-            next: "magicDeath", 
-            sound: "hit" 
-          }
-        ]
-      },
-      magicDeath: {
-        bg: "#1a0404",
-        glow: "rgba(220, 38, 38, 0.5)",
-        character: { name: "Malakor the Void Sorcerer", role: "Master of Shadows", avatar: "💀" },
-        text: "Malakor's void spells overwhelm your barrier. Dark magic consumes the realm...",
-        choices: [],
-        action: () => {
-          gameState.hp = 0;
-        }
-      },
-
-      // --- ENDINGS ---
-      winScroll: {
-        bg: "#0a1f18",
-        glow: "rgba(16, 185, 129, 0.6)",
-        character: { name: "High Priestess Lyra", role: "Guardian of the Astral Plane", avatar: "👑" },
-        text: "🎉 The holy light from your scroll purifies the World Tree! Malakor fades away and the magic realm is saved! YOU WIN!",
-        choices: []
-      },
-      winTear: {
-        bg: "#0a1f18",
-        glow: "rgba(217, 70, 239, 0.6)",
-        character: { name: "High Priestess Lyra", role: "Guardian of the Astral Plane", avatar: "👑" },
-        text: "🎉 The Phoenix Tear explodes into divine fire, destroying the corruption instantly! You are hailed as the Great Archmage! YOU WIN!",
-        choices: []
-      }
-    };
-
-    function updateStats() {
-      document.getElementById('hp').textContent = gameState.hp;
-      document.getElementById('gold').textContent = gameState.gold;
-      document.getElementById('item').textContent = gameState.item;
-    }
-
-    function showScene(key) {
-      const scene = storyData[key];
-      if (!scene) return;
-
-      if (scene.action) scene.action();
-      updateStats();
-
-      // Update background and glow
-      if (scene.bg) document.body.style.background = scene.bg;
-      if (scene.glow) document.getElementById('gameCard').style.setProperty('--glow', scene.glow);
-
-      // Update character profile
-      if (scene.character) {
-        document.getElementById('characterName').textContent = scene.character.name;
-        document.getElementById('characterRole').textContent = scene.character.role;
-        document.getElementById('characterAvatar').textContent = scene.character.avatar;
-      }
-
-      // Check for Game Over
-      if (gameState.hp <= 0) {
-        gameState.hp = 0;
-        updateStats();
-        playSound('hit');
-        document.getElementById('storyText').textContent = "☠️ MANA EXHAUSTED! The dark magic claims your soul.";
-        document.getElementById('choicesContainer').innerHTML = "";
-        document.getElementById('resetBtn').style.display = "block";
-        return;
-      }
-
-      document.getElementById('storyText').textContent = scene.text;
-      const container = document.getElementById('choicesContainer');
-      container.innerHTML = "";
-
-      if (scene.choices.length === 0) {
-        document.getElementById('resetBtn').style.display = "block";
-        return;
-      }
-
-      scene.choices.forEach(c => {
-        if (c.condition && !c.condition()) return;
+      choices: [
+        { text: "🌲 Follow the Glowing Mushroom Path into the woods", target: "forest" },
+        { text: "⛰️ Climb the Mist Mountains to speak with the Alchemist", target: "alchemist" }
+      ]
+    },
+    alchemist: {
+      speaker: "Master Ignis",
+      title: "Potion Master",
+      avatar: "🧪",
+      text: "In his mountain hut, Master Ignis stirs a cauldron. 'I can forge you a Phoenix Tear, but it costs 30 Gems—or I will trade it for your Starlight Scroll.'",
+      choices: () => {
+        const options = [];
         
-        const btn = document.createElement('button');
-        btn.className = 'choice-btn';
-        btn.textContent = c.text;
-        btn.onclick = () => {
-          if (c.sound) playSound(c.sound);
-          showScene(c.next);
-        };
-        container.appendChild(btn);
-      });
+        // Unlocks option when player reaches 30 Gems
+        if (gameState.gems >= 30) {
+          options.push({ text: "💎 Buy Phoenix Tear (Costs 30 Gems)", target: "buySuccess" });
+        }
+        
+        // Dynamic trade option
+        if (gameState.artifact === 'Starlight Scroll') {
+          options.push({ text: "🔄 Trade Starlight Scroll for Phoenix Tear", target: "tradeSuccess" });
+        }
+        
+        options.push({ text: "🏃 Leave the hut and dive into the Moonlit Grove", target: "forest" });
+        return options;
+      }
+    },
+    buySuccess: {
+      speaker: "Master Ignis",
+      title: "Potion Master",
+      avatar: "🧪",
+      text: "'Here is your Phoenix Tear! Thank you for the 30 Gems!'",
+      onEnter: () => {
+        gameState.gems -= 30;
+        gameState.artifact = 'Phoenix Tear';
+      },
+      choices: [
+        { text: "🌲 Enter the Moonlit Grove woods", target: "forest" }
+      ]
+    },
+    tradeSuccess: {
+      speaker: "Master Ignis",
+      title: "Potion Master",
+      avatar: "🧪",
+      text: "'A fine trade!' Ignis hands you a glowing red vial containing the Phoenix Tear.",
+      onEnter: () => {
+        gameState.artifact = 'Phoenix Tear';
+      },
+      choices: [
+        { text: "🌲 Enter the Moonlit Grove woods", target: "forest" }
+      ]
+    },
+    forest: {
+      speaker: "Sylph the Fairy",
+      title: "Forest Sprite",
+      avatar: "🧚",
+      text: "A glowing fairy named Sylph flits around your head. 'A shadow beast guards the ancient bridge ahead! How will you cross?'",
+      choices: () => {
+        const options = [];
+        if (gameState.artifact === 'Phoenix Tear') {
+          options.push({ text: "🔥 Use Phoenix Tear to purify the Shadow Beast", target: "win" });
+        }
+        options.push({ text: "⚔️ Attempt to fight the shadow beast with magic bolts", target: "die" });
+        return options;
+      }
+    },
+    die: {
+      speaker: "Narrator",
+      title: "Defeat",
+      avatar: "💀",
+      text: "Your magic bolts bounce harmlessly off the shadow beast's dark armor. You have fallen...",
+      choices: [
+        { text: "🔄 Restart Game", target: "start" }
+      ]
+    },
+    win: {
+      speaker: "High Priestess Lyra",
+      title: "Guardian of the Astral Plane",
+      avatar: "✨",
+      text: "The Phoenix Tear blazes with pure holy fire, purifying the shadow beast and curing the World Tree! You win!",
+      choices: [
+        { text: "🏆 Play Again", target: "start" }
+      ]
     }
+  };
 
-    function startGame() {
-      gameState = { hp: 100, gold: 0, item: "None" };
-      document.getElementById('resetBtn').style.display = "none";
-      showScene('start');
-    }
+  function updateUI() {
+    document.getElementById('manaVal').textContent = gameState.mana;
+    document.getElementById('gemsVal').textContent = gameState.gems;
+    document.getElementById('artifactVal').textContent = gameState.artifact;
+  }
 
-    // Launch game on page load
-    startGame();
-  </script>
+  function renderScene(sceneKey) {
+    gameState.currentScene = sceneKey;
+    const scene = story[sceneKey];
+    if (scene.onEnter) scene.onEnter();
+    updateUI();
+
+    document.getElementById('speakerName').textContent = scene.speaker;
+    document.getElementById('speakerTitle').textContent = scene.title;
+    document.getElementById('avatarIcon').textContent = scene.avatar;
+    document.getElementById('storyText').textContent = scene.text;
+
+    const choicesBox = document.getElementById('choicesBox');
+    choicesBox.innerHTML = '';
+
+    const currentChoices = typeof scene.choices === 'function' ? scene.choices() : scene.choices;
+
+    currentChoices.forEach(choice => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = choice.text;
+      btn.onclick = () => renderScene(choice.target);
+      choicesBox.appendChild(btn);
+    });
+  }
+
+  // Initial Launch
+  renderScene('start');
+</script>
 </body>
 </html>
 
