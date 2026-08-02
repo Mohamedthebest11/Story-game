@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Realm of Shadows - Story Adventure</title>
+  
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card: #182232;
+      --accent: #f59e0b;
+      --text: #f3f4f6;
+      --sub: #9ca3af;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .game-card {
+      background: var(--card);
+      border: 2px solid #233248;
+      border-radius: 16px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 550px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    .stats-bar {
+      display: flex;
+      justify-content: space-between;
+      background: #0f172a;
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-weight: bold;
+      margin-bottom: 1.2rem;
+      font-size: 0.95rem;
+    }
+
+    .stat {
+      color: var(--accent);
+    }
+
+    .story-text {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: #e5e7eb;
+      margin-bottom: 1.5rem;
+      min-height: 80px;
+    }
+
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .choice-btn {
+      background: #233248;
+      color: var(--text);
+      border: 1px solid #3b82f6;
+      padding: 12px 16px;
+      border-radius: 8px;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: 0.2s;
+      font-weight: 500;
+    }
+
+    .choice-btn:hover {
+      background: #3b82f6;
+      color: #fff;
+    }
+
+    .btn-reset {
+      background: var(--danger);
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      width: 100%;
+      margin-top: 15px;
+      cursor: pointer;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-card">
+    <!-- PLAYER STATS HEADER -->
+    <div class="stats-bar">
+      <div>❤️ HP: <span id="hp" class="stat">100</span></div>
+      <div>🪙 Gold: <span id="gold" class="stat">0</span></div>
+      <div>🎒 Item: <span id="item" class="stat">None</span></div>
+    </div>
+
+    <!-- MAIN STORY CONTENT -->
+    <div id="storyText" class="story-text">Loading story...</div>
+    
+    <!-- CHOICE BUTTONS -->
+    <div id="choicesContainer" class="choices"></div>
+    
+    <!-- RESTART BUTTON -->
+    <button id="resetBtn" class="btn-reset" onclick="startGame()">🔄 Restart Story</button>
+  </div>
+
+  <script>
+    let gameState = {};
+
+    const storyData = {
+      start: {
+        text: "You wake up at the entrance of a dark, ancient forest. A rusty sword lies on the ground beside a glowing stone pathway.",
+        choices: [
+          { 
+            text: "⚔️ Pick up the rusty sword and enter the dark woods", 
+            next: "forest", 
+            action: () => { gameState.item = "Rusty Sword"; } 
+          },
+          { 
+            text: "✨ Follow the glowing stone pathway", 
+            next: "pathway" 
+          }
+        ]
+      },
+      forest: {
+        text: "Deep in the woods, a snarling Goblin steps out from behind a tree demanding your gold!",
+        choices: [
+          { 
+            text: "⚔️ Fight the Goblin with your sword", 
+            next: "goblinFight", 
+            condition: () => gameState.item === "Rusty Sword" 
+          },
+          { 
+            text: "🏃 Run away back to the entrance", 
+            next: "start" 
+          },
+          { 
+            text: "💰 Offer to pay him", 
+            next: "goblinPay" 
+          }
+        ]
+      },
+      goblinFight: {
+        text: "You swing your rusty sword! After a tough battle, you slay the goblin and find 20 Gold coins in his pouch.",
+        choices: [
+          { text: "🏆 Continue deeper into the castle ahead", next: "castle" }
+        ],
+        action: () => {
+          gameState.gold += 20;
+          gameState.hp -= 15;
+        }
+      },
+      goblinPay: {
+        text: "You have no gold to offer! The angry goblin attacks you before fleeing.",
+        choices: [
+          { text: "🤕 Limp toward the castle ahead", next: "castle" }
+        ],
+        action: () => {
+          gameState.hp -= 40;
+        }
+      },
+      pathway: {
+        text: "The glowing pathway leads you to a peaceful shrine. An altar glows with restoration magic.",
+        choices: [
+          { text: "🙏 Pray at the altar", next: "shrineHeal" },
+          { text: "🏰 Head toward the distant castle towers", next: "castle" }
+        ]
+      },
+      shrineHeal: {
+        text: "A warm light fills you. You feel completely healed and find a Golden Key on the altar!",
+        choices: [
+          { 
+            text: "🔑 Take the Golden Key and head to the castle", 
+            next: "castle", 
+            action: () => { gameState.item = "Golden Key"; } 
+          }
+        ],
+        action: () => {
+          gameState.hp = 100;
+        }
+      },
+      castle: {
+        text: "You arrive at the colossal Castle Gates. A heavy iron lock holds the doors shut.",
+        choices: [
+          { 
+            text: "🔑 Use the Golden Key to unlock the gate", 
+            next: "win", 
+            condition: () => gameState.item === "Golden Key" 
+          },
+          { 
+            text: "⚔️ Force the gate open with your sword", 
+            next: "forceGate", 
+            condition: () => gameState.item === "Rusty Sword" 
+          },
+          { 
+            text: "🚪 Try to climb over the gate", 
+            next: "climbGate" 
+          }
+        ]
+      },
+      climbGate: {
+        text: "You slip off the sharp iron spikes and fall down hard! You didn't survive the drop.",
+        choices: [],
+        action: () => {
+          gameState.hp = 0;
+        }
+      },
+      forceGate: {
+        text: "Your sword snaps, but you manage to bash the latch open and squeeze inside!",
+        choices: [
+          { text: "🏰 Enter the treasure room!", next: "win" }
+        ],
+        action: () => {
+          gameState.hp -= 20;
+          gameState.item = "Broken Sword";
+        }
+      },
+      win: {
+        text: "🎉 You made it inside the Castle Treasure Room and discovered endless riches! YOU WIN!",
+        choices: []
+      }
+    };
+
+    function updateStats() {
+      document.getElementById('hp').textContent = gameState.hp;
+      document.getElementById('gold').textContent = gameState.gold;
+      document.getElementById('item').textContent = gameState.item;
+    }
+
+    function showScene(key) {
+      const scene = storyData[key];
+      if (!scene) return;
+
+      if (scene.action) scene.action();
+      updateStats();
+
+      // Check for Game Over
+      if (gameState.hp <= 0) {
+        gameState.hp = 0;
+        updateStats();
+        document.getElementById('storyText').textContent = "☠️ GAME OVER! You ran out of health.";
+        document.getElementById('choicesContainer').innerHTML = "";
+        document.getElementById('resetBtn').style.display = "block";
+        return;
+      }
+
+      document.getElementById('storyText').textContent = scene.text;
+      const container = document.getElementById('choicesContainer');
+      container.innerHTML = "";
+
+      if (scene.choices.length === 0) {
+        document.getElementById('resetBtn').style.display = "block";
+        return;
+      }
+
+      scene.choices.forEach(c => {
+        if (c.condition && !c.condition()) return;
+        
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.textContent = c.text;
+        btn.onclick = () => showScene(c.next);
+        container.appendChild(btn);
+      });
+    }
+
+    function startGame() {
+      gameState = { hp: 100, gold: 0, item: "None" };
+      document.getElementById('resetBtn').style.display = "none";
+      showScene('start');
+    }
+
+    // Start game on load
+    startGame();
+  </script>
+</body>
+</html>
